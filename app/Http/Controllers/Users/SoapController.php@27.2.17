@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers\Users;
+
+use App\Http\Controllers\UserController;
+//use App\Repositories\ContractRepository;
+//use App\Repositories\InvoiceRepository;
+//use App\Repositories\MeetingRepository;
+//use App\Repositories\OpportunityRepository;
+//use App\Repositories\PriceListRepository;
+//use App\Repositories\PriceListVersionRepository;
+//use App\Repositories\QuotationRepository;
+//use Efriandika\LaravelSettings\Facades\Settings;
+//use Sentinel;
+use App\Models\Invoice;
+use App\Http\Requests;
+use Illuminate\Support\Facades\URL;
+use \Input as Input;
+use DB;
+use App\Models\Slider;
+
+class SoapController extends UserController
+{
+	public function soapSetting(){
+		return View('user.soap.index',array('title' => 'Soapkoppeling'));////
+	}
+	public function soapFactuur(){
+			$arr = DB::table("invoices")->get();
+			?>
+            <strong>LCRM INVOICES</strong>
+            <table width="100%" border="2">
+            <thead>
+            	<td align="center">Invoice ID</td>
+                <td align="center">Invoice Date</td>
+                <td align="center">Action</td>
+            </thead>
+            <?php foreach($arr as $eachInvoice){ ?>
+				<tbody>
+                    <td align="center"><?php echo $eachInvoice->id;?></td>
+                    <td align="center"><?php echo $eachInvoice->invoice_date;?></td>
+                    <td align="center"><a href="http://93.158.221.197/files/public/update_invoice/<?php echo $eachInvoice->id; ?>">Insert Into Soapkoppeling</a></td>
+                </tbody>
+			<?php }	?>
+            </table><br/><br/><br/>
+            <strong>SOAPKOPPELING INVOICES</strong>
+            <br/><i>API key mismatch</i>
+            <?php
+			//print_r($arr);
+	}
+	public function updateFactuur($invoice_id){
+		$this->opennew();
+		echo "sd".$invoice_id;
+		}
+	public function opennew(){
+		echo "sds";	
+		}
+	public function soapRelatie(){
+		$users = DB::table('customers')
+            ->join('users', 'customers.user_id', '=', 'users.id')
+            ->get();
+		?>
+		<strong>LCRM Client</strong>
+            <table width="100%" border="2">
+            <thead>
+            	<td align="center">Customer ID</td>
+                <td align="center">Customer Name</td>
+                <td align="center">Action</td>
+            </thead>
+             <?php foreach($users as $eachCustomer){ ?>
+				<tbody>
+                    <td align="center"><?php echo $eachCustomer->user_id;?></td>
+                    <td align="center"><?php echo $eachCustomer->first_name." ".$eachCustomer->last_name;?></td>
+                    <td align="center"><a href="#">Insert Into Soapkoppeling</a></td>
+                </tbody>
+			<?php }	?>
+            </table><br/><br/><br/>
+            <strong>SOAPKOPPELING Client</strong>
+            <br/><i>API key mismatch</i>
+		<?php
+	}
+}

@@ -1,0 +1,68 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <div class="form-group">
+            <label class="control-label" for="title">{{trans('invoice.invoice_number')}}</label>
+
+            <div class="controls">
+                @if (isset($invoiceReceivePayment))
+                    {{ $invoiceReceivePayment->invoice->invoice_number }}
+                @endif
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title">{{trans('invoice.invoice_date')}}</label>
+
+            <div class="controls">
+                @if (isset($invoiceReceivePayment))
+                    {{ $invoiceReceivePayment->invoice->invoice_date }}
+                @endif
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title">{{trans('invoices_payment_log.payment_method')}}</label>
+
+            <div class="controls">
+                @if (isset($invoiceReceivePayment))
+                    {{ $invoiceReceivePayment->payment_method}}
+                @endif
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title">{{trans('invoice.payment_date')}}</label>
+
+            <div class="controls">
+                @if (isset($invoiceReceivePayment))
+                    {{ $invoiceReceivePayment->payment_date }}
+                @endif
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title">{{trans('invoices_payment_log.payment_number')}}</label>
+
+            <div class="controls">
+                @if (isset($invoiceReceivePayment))
+                    {{ $invoiceReceivePayment->payment_number }}
+                @endif
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title">{{trans('invoices_payment_log.paykey')}}</label>
+
+            <div class="controls">
+                @if (isset($invoiceReceivePayment))
+                    {{ $invoiceReceivePayment->paykey }}
+                @endif
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="controls">
+                @if (@$action == 'show')
+                    <a href="{{ url($type) }}" class="btn btn-primary"><i class="fa fa-arrow-left"></i> {{trans('table.close')}}</a>
+                @else
+                    <a href="{{ url($type) }}" class="btn btn-primary"><i class="fa fa-arrow-left"></i> {{trans('table.back')}}</a>
+                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> {{trans('table.delete')}}</button>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,109 @@
+<form class="form-horizontal" @submit.prevent="uploadFile">
+
+    <div class="fileinput fileinput-new" data-provides="fileinput" v-el:fileInput>
+        <span class="btn btn-default btn-file"><span class="fileinput-new">Select file</span><span
+                class="fileinput-exists">Change</span><input v-el:fileInput type="file" name="..."></span>
+        <span class="fileinput-filename"></span>
+        <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
+    </div>
+    <br>
+    <button class="btn btn-primary">Upload and Review</button>
+    <a href="{{url}}download-template" class="btn btn-primary">Download Template</a>
+</form>
+
+<h5 v-if="total">Imported : {{ completed.length }} / {{ total }}</h5>
+
+<table class="table sales-team import-wrapper"
+       v-if="total">
+    <thead>
+    <tr>
+        <th>
+            <label class="md-check">
+                <input type="checkbox" v-model="selectedAll">
+                <i class="primary"></i>
+            </label>
+        </th>
+        <th>Name</th>
+        <th>Quotations</th>
+        <th>Opportunities</th>
+        <th>Leads</th>
+        <th>Notes</th>
+        <th>Team Leader</th>
+        <th>Team Members</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr v-for="item in data" :class="{'alert-info':item.created}">
+        <td>
+            <label class="md-check" v-if="!item.created">
+                <input type="checkbox" v-model="item.selected">
+                <i class="primary"></i>
+            </label>
+        </td>
+        <td>
+            <h6 style="margin: 0">{{ item.salesteam }}</h6>
+
+            <div>Invoice Target: {{ item.invoice_target }}</div>
+            <div>Invoice Forecast: {{ item.invoice_forecast }}</div>
+
+            <div class="errors alert alert-danger" v-if="item.errors">
+                <ul>
+                    <li v-for="key in item.errors">
+                        {{ key }}
+                    </li>
+                </ul>
+            </div>
+        </td>
+        <td>
+            <label class="md-check">
+                <input type="checkbox" v-model="item.quotations">
+                <i class="primary"></i>
+            </label>
+        </td>
+        <td>
+            <label class="md-check">
+                <input type="checkbox" v-model="item.opportunities">
+                <i class="primary"></i>
+            </label>
+        </td>
+        <td>
+            <label class="md-check">
+                <input type="checkbox" v-model="item.leads">
+                <i class="primary"></i>
+            </label>
+        </td>
+        <td>{{ item.notes }}</td>
+        <td>
+            <select name="team_leader"
+                    v-select="item.team_leader"
+                    :options="staff"
+                    data-placeholder="Select Team Leader" style="width: 100%">
+                <option value="" disabled="disabled">default</option>
+            </select>
+        </td>
+        <td>
+            <select name="team_members"
+                    v-select="item.team_members"
+                    :options="staff"
+                    data-placeholder="Team Members"
+                    multiple style="width: 100%">
+            </select>
+        </td>
+        <td>
+            <button v-if="!item.created" class="btn btn-primary btn-xs" @click="createRecord(item)">Create</button>
+        </td>
+
+
+    </tr>
+    </tbody>
+</table>
+
+<div class="row">
+    <div class="col-md-12">
+        <a v-show="remaining.length > 0"
+           :class="{ 'disabled': !selected.length }"
+           href="" @click.prevent="createAll"
+           class="btn btn-primary pull-right">Create Selected</a>
+    </div>
+</div>

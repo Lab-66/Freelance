@@ -1,0 +1,102 @@
+<?php
+echo "asda";
+try
+		{
+			$client = new \SoapClient("https://soap.e-boekhouden.nl/soap.asmx?WSDL");
+			$date = new \DateTime("2017-04-13");
+			$startDate = $date->format('Y-m-d') . 'T' . $date->format('H:i:s');
+			$edate = new \DateTime("2017-04-14");
+			echo $endDate = $edate->format('Y-m-d') . 'T' . $edate->format('H:i:s');
+			// sessie openen en sessionid ophalen
+			$params = array(
+							"Username" => "lefgozer",
+							"SecurityCode1" => "e5908e507df3f151e6cf5662aa11134f",
+							"SecurityCode2" => "51022EEC-1C44-49AE-AF3E-32656B9089F5"
+							);
+			$response = $client->__soapCall("OpenSession", array($params));
+			if(!empty($response->OpenSessionResult->ErrorMsg->LastErrorCode)){
+			$this->checkforerror($response, "OpenSessionResult");}
+			$SessionID = $response->OpenSessionResult->SessionID;
+			echo "SessionID: " . $SessionID;
+			echo "<hr>";
+			//date_default_timezone_set('UTC');
+			// get the date
+			//$startDate = date("Y-m-d") . 'T' . date("H:i:s");
+			$getParams = array(
+							"SecurityCode2" => "51022EEC-1C44-49AE-AF3E-32656B9089F5",
+							"SessionID" => $SessionID,
+							"cFilter" => array(
+										"Factuurnummer" => "",
+										"Relatiecode" => "",
+										"DatumVan" => $startDate,
+										"DatumTm" => $endDate								
+										)
+			);
+			//print_r($getParams);
+			$getResponse = $client->__soapCall("GetFacturen", array($getParams));
+			//$this->checkforerror($getResponse, "GetFacturenResult");
+			
+			// sessie sluiten
+			$params = array(
+			"SessionID" => $SessionID
+			);
+			$response = $client->__soapCall("CloseSession", array($params));
+		}
+		
+		catch(SoapFault $soapFault)
+		{
+			echo '<strong>Er is een fout opgetreden:</strong><br>';
+			echo $soapFault;
+		}
+		$servername = "localhost";
+		$username = "root";
+		$password = "password";
+		$db = "lcrm";
+		
+		// Create connection
+		$conn = new mysqli($servername, $username, $password, $db);
+		
+		// Check connection
+		if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+		//echo "Connected successfully";
+		//$sql = "SELECT * FROM invoices";
+		//print_r($conn->query($sql))		;	
+									
+		foreach($getResponse->GetFacturenResult->Facturen->cFactuurList as $eachResponse){
+			/*$insertInvoice = "INSERT INTO `invoices`
+			 (`id`, `order_id`, `customer_id`, `sales_person_id`, `sales_team_id`, `invoice_number`, `invoice_date`, `due_date`, `payment_term`, `status`, `total`, `tax_amount`, `grand_total`, `unpaid_amount`, `discount`, `final_price`, `user_id`, `created_at`, `updated_at`, `deleted_at`) 
+			 VALUES (NULL, '0', '4', '5', '1', '".$eachResponse->Factuurnummer."', '".date("Y-m-d")."','".date("Y-m-d")."', '', 'Open Invoice', '".$eachResponse->TotaalExclBTW."', '".$eachResponse->TotaalBTW."', '".$eachResponse->TotaalInclBTW."', '".$eachResponse->TotaalInclBTW."', '0.00', '".$eachResponse->TotaalInclBTW."', '1', '".date("Y-m-d h:i:s")."', '".date("Y-m-d h:i:s")."', NULL)";#okay
+			
+			if ($conn->query($insertInvoice) === TRUE) {
+				echo "New record created successfully.============";
+				echo "=".$conn->insert_id."<br/>";
+				 $last_id = $conn->insert_id;
+				foreach($eachResponse->Regels->cFactuurRegel as $eachProduct){
+					$subTotal = $eachProduct->PrijsPerEenheid*$eachProduct->Aantal;
+					//echo "New record created successfully. Last inserted ID is: " . $last_id."<br/>";
+					$insertProducts = "INSERT INTO `invoices_products` (`id`, `invoice_id`, `product_id`, `product_name`, `description`, `quantity`, `price`, `sub_total`, `created_at`, `updated_at`, `deleted_at`) VALUES (NULL, '".$last_id."', '".trim($eachProduct->Code,'"')."', '".$eachProduct->Omschrijving."', NULL, '".$eachProduct->Aantal."', '".$eachProduct->PrijsPerEenheid."', '".$subTotal."', '".date("Y-m-d h:i:s")."', '".date("Y-m-d h:i:s")."', NULL)";
+					if ($conn->query($insertProducts) === TRUE) {
+						echo "==".$conn->insert_id."<br/>";
+					}
+				}
+			} else {
+				echo "Error: " . $insertInvoice . "<br>" . $conn->error;
+			}*/#okay
+			
+			/*$selectQuery = "select id from invoices";
+			print_r($conn->query($selectQuery));*/
+			
+			
+			/*$insertInvoice = DB::table('invoices')->insertGetId(array(
+										'customer_id' => 4, 'sales_person_id' => 3, 'sales_team_id' => 1, 'invoice_number' => $eachResponse->Factuurnummer, 	'invoice_date' => date("Y-m-d"), 'status' => 'Open Invoice', 'total' =>$eachResponse->TotaalExclBTW, 'tax_amount' => $eachResponse->TotaalExclBTW, 'tax_amount' => $eachResponse->TotaalBTW, 'grand_total' => $eachResponse->TotaalInclBTW, 'unpaid_amount' => $eachResponse->TotaalInclBTW,'final_price' => $eachResponse->TotaalInclBTW, 'user_id' => 1, 'created_at' => date("Y-m-d h:i:s"), 'updated_at' => date("Y-m-d h:i:s"))
+									);
+			
+			foreach($eachResponse->Regels->cFactuurRegel as $eachProduct){
+				$subTotal = $eachProduct->PrijsPerEenheid*$eachProduct->Aantal;
+				$insertInvoiceProduct = DB::table('invoices_products')->insert([
+										['invoice_id' => $insertInvoice, 'product_id' => trim($eachProduct->Code,'"'), 'product_name' => $eachProduct->Omschrijving, 'quantity' => $eachProduct->Aantal,'price' => $eachProduct->PrijsPerEenheid, 'sub_total' => $subTotal, 'created_at' => date("Y-m-d h:i:s"), 'updated_at' => date("Y-m-d h:i:s")]
+									]);*/
+			}
+?> 

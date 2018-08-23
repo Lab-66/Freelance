@@ -1,0 +1,26 @@
+@extends('layouts.user')
+
+@section('title')
+    {{ $title }}
+    
+@stop
+@section('scripts')
+<link rel="stylesheet" href="cal/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="cal/assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="cal/assets/css/calendar.css">
+    <link rel="stylesheet" href="cal/assets/css/calendar_full.css">
+    <link rel="stylesheet" href="cal/assets/css/calendar_compact.css">
+ <!-- Include config file -->
+    <script src="cal/config/config.js"></script>
+    
+    <!-- Include events calendar language file -->
+    <script src="cal/assets/languages/en.js"></script>
+    <script src="cal/assets/js/jquery.min.js"></script>
+	<script src="cal/assets/js/calendar.js"></script>
+@stop
+@section('content')
+
+    <div class="tiva-events-calendar full asa" data-source="php"></div>
+    
+@stop
+

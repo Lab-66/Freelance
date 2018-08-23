@@ -1,0 +1,106 @@
+<div v-cloak class="box1">
+    <div class="row">
+        <!-- column -->
+        <div class="col-sm-4 col-md-3">
+            <div id="cnt-list">
+                <div class="input-group">
+                    <span class="input-group-addon no-border no-bg"><i class="fa fa-search"></i></span>
+                    <input type="text" class="form-control no-border no-bg"
+                           placeholder="Search email templates"
+                           v-model="query">
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="list"
+                             v-for="item in email_templates | filterBy query in 'title'"
+                             :class="{'active': item.selected }" style="cursor: pointer">
+                            <div class="list-item pointer"
+                                 v-on:click="selectItem(item)">
+                                <div class="list-body">
+                                    <h5 class="contact-name">{{ item.title }}</h5>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /column -->
+
+        <!-- column -->
+        <div class="col-sm-6 col-md-9">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div id="cnt-list-details">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="{{ url }}create" class="btn btn-default">
+                                    <i class="fa fa-plus fa-fw"></i> New Email Template
+                                </a>
+                            </div>
+                        </div>
+                        <div v-if="item">
+
+
+                            <div style="margin: 10px 0">
+                                <div>
+                                    <a class="btn btn-sm btn-danger pull-right"
+                                       v-on:click="deleteItem(item)">
+                                        <i class="fa fa-times"></i></a>
+                                    <a class="btn btn-sm btn-primary"
+                                       v-show="!item.editing"
+                                       v-on:click="editItem(item)">Edit</a>
+                                    <a class="btn btn-sm btn-primary" v-show="item.editing"
+                                       v-on:click="doneEditing(item)">Done</a>
+                                </div>
+                                <div class="errors alert alert-danger" v-if="errors">
+                                    <ul>
+                                        <li v-for="key in errors">
+                                            {{ key }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <!-- fields test -->
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 form-control-label">Title sds</label>
+
+                                            <div class="col-sm-9">
+                                                <div class="form-group"
+                                                     v-show="!item.editing">{{item.title}}
+                                                </div>
+                                                <input type="text"
+                                                       class="form-control"
+                                                       v-show="item.editing"
+                                                       v-model="item.title">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-3  form-control-label asas">Text sa</label>
+
+                                            <div class="col-sm-9">
+                                                <div class="form-group"
+                                                     v-show="!item.editing">{{item.text}}
+                                                </div>
+                                        <textarea class="form-control" v-show="item.editing"
+                                                  v-model="item.text" rows="5"></textarea>
+                                            </div>
+                                        </div>
+										
+                                    </div>
+                                    <!-- / fields terf -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /column -->
+    </div>
+</div>

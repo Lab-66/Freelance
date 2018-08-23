@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Http\Controllers\Users;
+
+use App\Http\Controllers\UserController;
+use App\Repositories\ContractRepository;
+use App\Repositories\InvoiceRepository;
+use App\Repositories\MeetingRepository;
+use App\Repositories\OpportunityRepository;
+use App\Repositories\PriceListRepository;
+use App\Repositories\PriceListVersionRepository;
+use App\Repositories\QuotationRepository;
+use Efriandika\LaravelSettings\Facades\Settings;
+use Sentinel;
+use App\Http\Requests;
+use Illuminate\Support\Facades\URL;
+use \Input as Input;
+use DB;
+use App\Models\Slider;
+
+class SliderController extends UserController
+{
+	public function getImag(){
+		return View('user.slider.index',array('title' => 'Backgorund Slider'));////
+	}
+	public function uploadImag(){
+
+		if(Input::hasFile('file')){
+			$file = Input::file('file');
+			$file->move('uploads', $file->getClientOriginalName());
+			/* insert in DB */
+			$slider = new slider;
+			$slider->img_path = $file->getClientOriginalName();
+			$slider->save();
+			//echo '<img src="uploads/'.$file->getClientOriginalName().'" />';
+			//echo "uploaded";
+			header("Location:bg_slider");
+			die();	
+		}
+		
+	}
+	public function removeImag(){
+		DB::table('bg_slider')->where('id', '=', $_GET['id'])->delete();
+		header("Location:bg_slider");
+		die();	
+	}
+}

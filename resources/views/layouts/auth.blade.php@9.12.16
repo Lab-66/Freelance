@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    @include('layouts._meta')
+    @include('layouts._assets')
+</head>
+<body id="bg-img">
+<!-- #################### slider ################## -->
+  <div id="slides">
+    <div class="slides-container">
+      <img src="http://93.158.221.197/files/public/slider/images/crm_login_bg.png" alt="Cinelli">
+      <img src="http://93.158.221.197/files/public/slider/images/people.jpeg" width="1024" height="682" alt="Surly">
+      <img src="http://93.158.221.197/files/public/slider/images/surly.jpeg" width="1024" height="683" alt="Cinelli">
+      <img src="http://93.158.221.197/files/public/slider/images/affinity.jpeg" width="1024" height="685" alt="Affinity">
+    </div>
+
+ 
+ 
+ 
+<!-- #################### slider ################## -->
+<div class="app" id="app">
+    <!-- ############ LAYOUT START-->
+    <div class="login animated fadeIn">
+        <div class="navbar">
+                <!-- brand -->
+            <a class="navbar-brand text-center" style="float:none;">
+                <img src="{{ asset('uploads/site/'.Settings::get('site_logo')) }}"
+                     alt="{{ Settings::get('site_name') }}" class="img-responsive"
+                     style="margin:auto;width:100px;height:35px;">
+                </a>
+                <!-- / brand -->
+        </div>
+        @include('flash::message')
+        @yield('content')
+    </div>
+
+    <!-- ############ LAYOUT END-->
+
+</div>
+<nav class="slides-navigation">
+      <a href="#" class="next">Next</a>
+      <a href="#" class="prev">Previous</a>
+    </nav>
+  </div>
+  <link rel="stylesheet" href="http://93.158.221.197/files/public/slider/css/superslides.css">
+ <script src="http://93.158.221.197/files/public/slider/javascripts/jquery.min.js"></script>
+  <script src="http://93.158.221.197/files/public/slider/javascripts/jquery.easing.1.3.js"></script>
+  <script src="http://93.158.221.197/files/public/slider/javascripts/jquery.animate-enhanced.min.js"></script>
+  <script src="http://93.158.221.197/files/public/slider/javascripts/jquery.superslides.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+  var j = jQuery.noConflict();
+    j(function() {
+      j('#slides').superslides({
+        animation: 'fade',
+        play: 3000
+      });
+    });
+  </script>
+@include('layouts._assets_footer')
+</body>
+</html>

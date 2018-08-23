@@ -1,0 +1,103 @@
+@extends('layouts.user')
+
+@section('title')
+    {{ $title }}
+    
+@stop
+@section('scripts')
+<link rel="stylesheet" href="cal/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="cal/assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="cal/assets/css/calendar.css">
+    <link rel="stylesheet" href="cal/assets/css/calendar_full.css">
+    <link rel="stylesheet" href="cal/assets/css/calendar_compact.css">
+ <!-- Include config file -->
+    <script src="cal/config/config.js"></script>
+    
+    <!-- Include events calendar language file -->
+    <script src="cal/assets/languages/en.js"></script>
+    <script src="cal/assets/js/jquery.min.js"></script>
+	<script src="cal/assets/js/calendar.js"></script>
+
+   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+   <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script>
+    jQuery(function(){
+         // Find any date inputs and override their functionality
+         jQuery('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd' });
+    });
+</script>
+@stop
+@section('content')
+<?php  
+       session_start();
+       require('cal/oauth.php');
+       require('cal/outlook.php');
+       //print_r($_SESSION);die();
+
+       //$loggedIn = !is_null($_SESSION['access_token']);
+        $loggedIn = !empty($_SESSION['access_token']);
+       $redirectUri = 'http://93.158.221.197/files/public/cal/authorize.php';
+?>
+<div class="tiva-events-calendar full" data-source="php"></div>
+   
+
+    <?php 
+      if (!$loggedIn) {
+    ?>
+    <a href="<?php echo oAuthService::getLoginUrl($redirectUri)?>">sign in</a> with your Office 365 or Outlook.com account.</p>
+    <?php
+      }
+      else {
+         $events = OutlookService::getEvents($_SESSION['access_token'], $_SESSION['user_email']);
+    ?>
+      <!-- User is logged in, do something here -->
+      <h2>Your events</h2>
+      
+      <table>
+        <tr>
+          <th>Id</th>
+          <th>Subject</th>
+          <th>Body</th>
+          <th>Start</th>
+          <th>End</th>
+        </tr>
+        <?php foreach($events['value'] as $event) { ?>
+          <tr>
+            <td><?php echo $event['Id'] ?></td>
+            <td><?php echo $event['Subject'] ?></td>
+            <td><?php echo $event['Body']['Content'] ?></td>
+            <td><?php echo $event['Start']['DateTime'] ?></td>
+            <td><?php echo $event['End']['DateTime'] ?></td>
+          </tr>
+        <?php } ?>
+      </table>
+    <?php    
+      } ?>
+    <h1>Create a new event</h1>
+    
+    <table>
+        {!! Form::open(array('url' => 'agenda/create', 'method' => 'PUT')) !!}
+             <tr>
+                    <td>Event Name:</td>
+                    <td>{!! Form::text('ename') !!}</td>
+            </tr>
+            <tr>
+                <td>Event Description:</td>
+                <td>{!! Form::textarea('edecs') !!}</td>
+            </tr>
+             <tr>
+                <td>Start Date:</td>
+                <td>{!! Form::input('date', 'start-date') !!}</td>
+            </tr>
+            <tr>
+                <td>End Date:</td>
+                <td>{!! Form::input('date', 'end-date') !!}</td>
+            </tr>
+            <tr>
+                <td colspan="2"> {!! Form::submit('Save', array('class' => 'name')) !!}</td>
+            </tr>
+        {!! Form::close() !!}
+     </table>
+@stop
+

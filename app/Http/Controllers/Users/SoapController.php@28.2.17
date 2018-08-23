@@ -1,0 +1,210 @@
+<?php
+
+namespace App\Http\Controllers\Users;
+
+use App\Http\Controllers\UserController;
+//use App\Repositories\ContractRepository;
+//use App\Repositories\InvoiceRepository;
+//use App\Repositories\MeetingRepository;
+//use App\Repositories\OpportunityRepository;
+//use App\Repositories\PriceListRepository;
+//use App\Repositories\PriceListVersionRepository;
+//use App\Repositories\QuotationRepository;
+//use Efriandika\LaravelSettings\Facades\Settings;
+//use Sentinel;
+use App\Models\Invoice;
+use App\Http\Requests;
+use Illuminate\Support\Facades\URL;
+use \Input as Input;
+use DB;
+use App\Models\Slider;
+
+class SoapController extends UserController
+{
+	public function soapSetting(){
+		return View('user.soap.index',array('title' => 'Soapkoppeling'));////
+	}
+	public function soapFactuur(){
+			$arr = DB::table("invoices")->get();
+			?>
+            <strong>LCRM INVOICES</strong>
+            <table width="100%" border="2">
+            <thead>
+            	<td align="center">Invoice ID</td>
+                <td align="center">Invoice Date</td>
+                <td align="center">Action</td>
+            </thead>
+            <?php foreach($arr as $eachInvoice){ ?>
+				<tbody>
+                    <td align="center"><?php echo $eachInvoice->id;?></td>
+                    <td align="center"><?php echo $eachInvoice->invoice_date;?></td>
+                    <td align="center"><a href="http://93.158.221.197/files/public/update_invoice/<?php echo $eachInvoice->id; ?>">Insert Into Soapkoppeling</a></td>
+                </tbody>
+			<?php }	?>
+            </table><br/><br/><br/>
+            <strong>SOAPKOPPELING INVOICES</strong>
+            <br/><i>API key mismatch</i>
+            <?php
+			//print_r($arr);
+	}
+	
+	public function updateFactuur($invoice_id){
+		//$this->connectSoap();
+		//echo "sd".$invoice_id;
+		try
+		{
+		$client = new \SoapClient("https://soap.e-boekhouden.nl/soap.asmx?WSDL");
+		$Username = "lefgozer";
+		$SecurityCode1 = "e5908e507df3f151e6cf5662aa11134f";
+		$SecurityCode2 = "51022EEC-1C44-49AE-AF3E-32656B9089F5";
+		// sessie openen en sessionid ophalen
+		$params = array(
+						"Username" => $Username,
+						"SecurityCode1" => $SecurityCode1,
+						"SecurityCode2" => $SecurityCode2
+						);
+		$response = $client->__soapCall("OpenSession", array($params));
+		$this->checkforerror($response, "OpenSessionResult");
+		$SessionID = $response->OpenSessionResult->SessionID;
+		echo "SessionID: " . $SessionID;
+		echo "<hr>";
+		date_default_timezone_set('UTC');
+		// get the date
+		$DatumVan = date("2017-01-17") . 'T' . date("H:i:s");
+		$DatumTm = date("2017-02-09") . 'T' . date("H:i:s");
+		// opvragen alle grootboekrekeningen van de categorie balans
+		/*############################# Get Grootboekrekeningen ###############################*/
+		$params = array(
+						"SecurityCode2" => $SecurityCode2,
+						"SessionID" => $SessionID,
+						"cFilter" => array(
+									"Factuurnummer" => "",
+									"Relatiecode" => "",
+									"DatumVan" => $DatumVan,
+									"DatumTm" => $DatumTm
+									)
+		);
+		$response = $client->__soapCall("GetFacturen", array($params));
+		//print_r($response);
+		$this->checkforerror($response, "GetFacturenResult");
+		$Rekeningen = $response->GetFacturenResult->Facturen;
+		// indien een resultaat, dan even een array maken
+		if(!is_array($Rekeningen->cFactuurList))
+		$Rekeningen->cFactuurList = array($Rekeningen->cFactuurList);
+		// weergeven van alle 
+		//opgehaalde grootboekrekeningen...
+		//print_r($Rekeningen);
+		echo '<table border="3" width="100%">';
+		echo '<tr><th>ID</th><th>Code</th><th>Omschrijving</th>';
+		echo '<th>Categorie</th><th>Groep</th></tr>';
+		
+		foreach ($Rekeningen->cFactuurList as $Rekening) {
+				echo '<tr>'; 
+				echo '<td>' . $Rekening->Factuurnummer . '</td>';
+				echo '<td>' . $Rekening->Relatiecode . '</td>';
+				echo '<td>' . $Rekening->TotaalExclBTW . '</td>';
+				echo '<td>' . $Rekening->TotaalBTW . '</td>';
+				echo '<td>' . $Rekening->TotaalInclBTW . '</td>';
+				echo '</tr>';
+		}
+		echo '</table>';
+		/*############################# Add Grootboekrekeningen ###############################*/
+		date_default_timezone_set('UTC');
+		// get the date
+		$startDate = date("Y-m-d") . 'T' . date("H:i:s");
+		$addParams = array(
+						"SecurityCode2" => $SecurityCode2,
+						"SessionID" => $SessionID,
+						"oFact" => array(
+									"Factuurnummer" => "",
+									"Relatiecode" => "R001",
+									"Datum" => $startDate,
+									"Betalingstermijn" => 20,
+									"Factuursjabloon" => "Voorbeeld 1",
+									"PerEmailVerzenden" => 0,
+									"AutomatischeIncasso" => 0,
+									"IncassoMachtigingDatumOndertekening" => $startDate,
+									"IncassoMachtigingFirst" => 0,
+									"IncassoRekeningNummer" => "sds",
+									"InBoekhoudingPlaatsen" => 0,
+									"Regels" => array(
+												  "cFactuurRegel" => array(
+																		"Aantal" => 1,
+																		"Eenheid" => "stuk",
+																		"Code" => "001",
+																		"Omschrijving" => "test Omschrijving",
+																		"PrijsPerEenheid" => 10,
+																		"BTWCode" => "LAAG_VERK",
+																		"TegenrekeningCode" => "0130",
+																		"KostenplaatsID" => 0
+																		)		
+														
+													  )
+									
+									)
+		);
+		//$addResponse = $client->__soapCall("AddFactuur", array($addParams));
+		echo "AddFactuur added successfully";
+		/*############################ Update Grootboekrekening ################################*/
+		//$updateParams = array(
+		//				"SecurityCode2" => $SecurityCode2,
+		//				"SessionID" => $SessionID,
+		//				oGb => array(
+		//							"ID" => 5260545,
+		//							"Code" => "G001",
+		//							"Omschrijving" => "test1",
+		//							"Categorie" => "BAL",
+		//							"Groep" => ""
+		//							)
+		//);
+		//$addResponse = $client->__soapCall("UpdateGrootboekrekening", array($updateParams));
+		//echo "Grootboekrekening updated successfully";
+		
+		// sessie sluiten
+		$params = array(
+		"SessionID" => $SessionID
+		);
+		$response = $client->__soapCall("CloseSession", array($params));
+		}
+		
+		catch(SoapFault $soapFault)
+		{
+		echo '<strong>Er is een fout opgetreden:</strong><br>';
+		echo $soapFault;
+		}
+		}
+	public function checkforerror($rawresponse, $sub) {
+		$LastErrorCode = $rawresponse->$sub->ErrorMsg->LastErrorCode;
+		$LastErrorDescription = $rawresponse->$sub->ErrorMsg->LastErrorDescription;
+		if($LastErrorCode <> '') {
+			echo '<strong>Er is een fo
+			ut opgetreden:</strong><br>';
+			echo $LastErrorCode . ': ' . $LastErrorDescription;
+			exit();
+		}
+	}
+	public function soapRelatie(){
+		$users = DB::table('customers')
+            ->join('users', 'customers.user_id', '=', 'users.id')
+            ->get();
+		?>
+		<strong>LCRM Client</strong>
+            <table width="100%" border="2">
+            <thead>
+            	<td align="center">Customer ID</td>
+                <td align="center">Customer Name</td>
+                <td align="center">Action</td>
+            </thead>
+             <?php foreach($users as $eachCustomer){ ?>
+				<tbody>
+                    <td align="center"><?php echo $eachCustomer->user_id;?></td>
+                    <td align="center"><?php echo $eachCustomer->first_name." ".$eachCustomer->last_name;?></td>
+                    <td align="center"><a href="#">Insert Into Soapkoppeling</a></td>
+                </tbody>
+			<?php }	?>
+            </table><br/><br/><br/>
+            <strong>SOAPKOPPELING Client</strong>
+            <br/><i>API key mismatch</i>
+		<?php
+	}
+}

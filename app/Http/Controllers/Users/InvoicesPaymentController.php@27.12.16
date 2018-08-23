@@ -1,0 +1,206 @@
+<?php
+
+namespace App\Http\Controllers\Users;
+
+use App\Http\Controllers\UserController;
+use App\Http\Requests\InvoiceReceivePaymentRequest;
+use App\Http\Requests\InvoiceRequest;
+use App\Models\Invoice;
+use App\Models\InvoiceReceivePayment;
+use App\Models\Option;
+use App\Repositories\CompanyRepository;
+use App\Repositories\InvoicePaymentRepository;
+use App\Repositories\InvoiceRepository;
+use App\Repositories\OptionRepository;
+use App\Repositories\UserRepository;
+use Efriandika\LaravelSettings\Facades\Settings;
+use Sentinel;
+use App\Http\Requests;
+use yajra\Datatables\Datatables;
+
+class InvoicesPaymentController extends UserController
+{
+    /**
+     * @var InvoicePaymentRepository
+     */
+    private $invoicePaymentRepository;
+
+    /**
+     * @var CompanyRepository
+     */
+    private $companyRepository;
+
+    /**
+     * @var InvoiceRepository
+     */
+    private $invoiceRepository;
+
+    /**
+     * @var UserRepository
+     */
+    private $userRepository;
+    /**
+     * @var OptionRepository
+     */
+    private $optionRepository;
+
+    /**
+     * @param InvoicePaymentRepository $invoicePaymentRepository
+     * @param CompanyRepository $companyRepository
+     * @param InvoiceRepository $invoiceRepository
+     * @param UserRepository $userRepository
+     * @param OptionRepository $optionRepository
+     */
+    public function __construct(InvoicePaymentRepository $invoicePaymentRepository,
+                                CompanyRepository $companyRepository,
+                                InvoiceRepository $invoiceRepository,
+                                UserRepository $userRepository,
+                                OptionRepository $optionRepository)
+    {
+        parent::__construct();
+
+        $this->invoicePaymentRepository = $invoicePaymentRepository;
+        $this->companyRepository = $companyRepository;
+        $this->invoiceRepository = $invoiceRepository;
+        $this->userRepository = $userRepository;
+        $this->optionRepository = $optionRepository;
+
+        view()->share('type', 'invoices_payment_log');
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $title = trans('invoices_payment_log.invoices_payment_log');
+        return view('user.invoices_payment_log.index', compact('title'));
+    }
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        $title = trans('invoice.new');
+        $invoices = $this->invoiceRepository->getAll()
+            ->where('status','Open Invoice')
+            ->orWhere('status','Overdue invoice')
+            ->orderBy('invoice_number', 'asc')
+            ->lists('invoice_number', 'id');
+
+        $this->generateParams();
+        return view('user.invoices_payment_log.create', compact('title', 'invoices'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param InvoiceReceivePaymentRequest|Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(InvoiceReceivePaymentRequest $request)
+    {
+        //print_r($request->payment_method);
+        if($request->payment_method == 'Mollie'){
+            header("Location: http://93.158.221.197/files/public/mollie/webhook?invoice_id=".$request->invoice_id);
+            die();
+        }
+        //die('store');
+        $invoice = Invoice::find($request->invoice_id);
+
+        $total_fields = InvoiceReceivePayment::orderBy('id', 'desc')->first();
+
+        $quotation_no = Settings::get('invoice_payment_prefix') . (Settings::get('invoice_payment_start_number') + (isset($total_fields) ? $total_fields->id : 0) + 1);
+
+        $invoiceRepository = $this->invoiceRepository->create($request->except('invoice_id'));
+        $invoiceRepository->invoice()->associate($invoice);
+        $invoiceRepository->payment_number = $quotation_no;
+        $invoiceRepository->save();
+
+        $unpaid_amount_new = bcsub($invoice->unpaid_amount, $request->payment_received, 2);
+
+        if ($unpaid_amount_new <= '0') {
+            $invoice_data = array(
+                'unpaid_amount' => $unpaid_amount_new,
+                'status' => 'Paid Invoice',
+            );
+        } else {
+            $invoice_data = array(
+                'unpaid_amount' => $unpaid_amount_new,
+            );
+        }
+
+        $invoice->update($invoice_data);
+
+        return redirect("invoices_payment_log");
+    }
+
+    public function show(InvoiceReceivePayment $invoiceReceivePayment)
+    {
+        $title = trans('invoice.show');
+        $action = 'show';
+        return view('user.invoices_payment_log.show', compact('title', 'action','invoiceReceivePayment'));
+    }
+
+    public function delete(InvoiceReceivePayment $invoiceReceivePayment)
+    {
+        $title = trans('invoice.delete');
+        return view('user.invoices_payment_log.delete', compact('title', 'invoiceReceivePayment'));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  Invoice $invoice
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(InvoiceReceivePayment $invoiceReceivePayment)
+    {
+        $invoiceReceivePayment->delete();
+        return redirect('invoices_payment_log');
+    }
+
+
+    public function data()
+    {
+        $invoice_payments = $this->invoicePaymentRepository->getAll()
+            ->with('invoice.customer', 'invoice.salesPerson')
+            ->get()->map(function ($ip) {
+                return [
+                    'id' => $ip->id,
+                    'payment_number' =>  $ip->payment_number,
+                    'payment_received' => $ip->payment_received,
+                    'invoice_number' => isset($ip->invoice) ? $ip->invoice->invoice_number : '',
+                    'payment_method' => $ip->payment_method,
+                    'payment_date' => $ip->payment_date,
+                    'customer' => (isset($ip->invoice) && isset($ip->invoice->customer)) ?$ip->invoice->customer->full_name: "",
+                    'salesperson' => (isset($ip->invoice) && isset($ip->invoice->salesPerson)) ?$ip->invoice->salesPerson->full_name: ""
+                ];
+            });
+
+        return Datatables::of($invoice_payments)
+            ->add_column('actions', '<a href="{{ url(\'invoices_payment_log/\' . $id . \'/show\' ) }}" title="{{ trans(\'table.details\') }}">
+                                            <i class="fa fa-fw fa-eye text-primary"></i> </a>')
+            ->remove_column('id')
+            ->make();
+    }
+
+    private function generateParams()
+    {
+        $payment_methods = $this->optionRepository->getAll()
+            ->where('category', 'payment_methods')
+            ->get()
+            ->map(function ($title) {
+                return [
+                    'title' => $title->title,
+                    'value'   => $title->value,
+                ];
+            })->lists('title', 'value')->toArray();
+
+        view()->share('payment_methods', $payment_methods);
+    }
+}

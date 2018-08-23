@@ -1,0 +1,128 @@
+<form class="form-horizontal" @submit.prevent="uploadFile">
+    <div class="fileinput fileinput-new" data-provides="fileinput" v-el:fileInput>
+        <span class="btn btn-default btn-file"><span class="fileinput-new">Select file</span><span
+                class="fileinput-exists">Change</span><input type="file" v-el:fileInput name="..."></span>
+        <span class="fileinput-filename"></span>
+        <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
+    </div>
+    <br>
+    <button class="btn btn-primary">Upload and Review</button>
+    <a href="{{url}}download-template" class="btn btn-primary">Download Template</a>
+</form>
+
+<h5 v-if="total">Imported : {{ completed.length }} / {{ total }}</h5>
+
+<table class="table sales-team import-wrapper"
+       v-if="total">
+    <thead>
+    <tr>
+        <th>
+            <label class="md-check">
+                <input type="checkbox" v-model="selectedAll">
+                <i class="primary"></i>
+            </label>
+        </th>
+        <th>Opportunity</th>
+        <th>Names</th>
+        <th>Address</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Mobile</th>
+        <th>Fax</th>
+        <th>Function</th>
+        <th>Company</th>
+        <th>Country</th>
+        <th>Sales Team</th>
+        <th>Notes</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr v-for="item in data" :class="{'alert-info':item.created}">
+        <td>
+            <label class="md-check" v-if="!item.created">
+                <input type="checkbox" v-model="item.selected">
+                <i class="primary"></i>
+            </label>
+        </td>
+        
+        
+         <td>
+            {{ item.opportunity }}
+        </td>
+        
+        
+         <td>
+            {{ item.contact_name }}
+        </td>
+        
+         <td>
+            {{ item.address }}
+        </td>
+
+        <td>
+            {{ item.email }}
+        </td>
+        
+         <td>
+            {{ item.phone }}
+        </td>
+        
+        <td>
+            {{ item.mobile }}
+        </td>
+        <td>
+            {{ item.fax }}
+        </td>
+        <td>
+            {{ item.function }}
+        </td>
+        
+        <td>
+            {{ item.company_name }}
+        </td>
+
+        
+        
+         <td>
+            <select name="country_id"
+                    v-select="item.country_id"
+                    :options="countries"
+                    data-placeholder="Select Country" style="width: 100%">
+                <option value="" disabled="disabled">default</option>
+            </select>
+        </td>
+        
+        <td>
+            <select name="sales_team_id"
+                    v-select="item.sales_team_id"
+                    :options="salesteams"
+                    data-placeholder="Select Team" style="width: 100%">
+                <option value="" disabled="disabled">default</option>
+            </select>
+        </td>
+        
+        
+        <td>
+            {{ item.internal_notes }}
+        </td>
+        
+        <td>
+            <button v-if="!item.created" class="btn btn-primary btn-xs" @click="createRecord(item)">Create</button>
+        </td>
+        
+
+
+    </tr>
+    </tbody>
+</table>
+
+<div class="row">
+    <div class="col-md-12">
+        <a v-show="remaining.length > 0"
+           :class="{ 'disabled': !selected.length }"
+           href="" @click.prevent="createAll"
+           class="btn btn-primary pull-right">Create Selected</a>
+    </div>
+</div>
+

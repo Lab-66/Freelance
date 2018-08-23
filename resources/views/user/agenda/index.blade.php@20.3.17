@@ -1,0 +1,112 @@
+@extends('layouts.user')
+
+@section('title')
+    {{ $title }}
+    
+@stop
+@section('scripts')
+<link rel="stylesheet" href="cal/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="cal/assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="cal/assets/css/calendar.css">
+    <link rel="stylesheet" href="cal/assets/css/calendar_full.css">
+    <link rel="stylesheet" href="cal/assets/css/calendar_compact.css">
+ <!-- Include config file -->
+    <script src="cal/config/config.js"></script>
+    
+    <!-- Include events calendar language file -->
+    <script src="cal/assets/languages/en.js"></script>
+    <script src="cal/assets/js/jquery.min.js"></script>
+	<script src="cal/assets/js/calendar.js"></script>
+
+   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+   <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script>
+    jQuery(function(){
+         // Find any date inputs and override their functionality
+         jQuery('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd' });
+    });
+</script>
+@stop
+@section('content')
+<?php  
+       session_start();
+       require('cal/oauth.php');
+       require('cal/outlook.php');
+       //print_r($_SESSION);die();
+
+       //$loggedIn = !is_null($_SESSION['access_token']);
+        $loggedIn = !empty($_SESSION['access_token']);
+       $redirectUri = 'https://anythingbutbush2004.com/files/public/cal/authorize.php';
+?>
+<div class="tiva-events-calendar full" data-source="php"></div>
+   
+
+    <?php 
+      if (!$loggedIn) {
+    ?>
+    <a href="<?php echo oAuthService::getLoginUrl($redirectUri)?>">sign in</a> with your Office 365 or Outlook.com account.</p>
+    <?php
+      }
+      else {
+         $events = OutlookService::getEvents($_SESSION['access_token'], $_SESSION['user_email']);
+    ?>
+      <!-- User is logged in, do something here -->
+      <h2>Events sync sussceefully.</h2>
+      
+     
+        <?php foreach($events['value'] as $event) { ?>
+        <?php 
+        //print_r($event);
+        $getCount = DB::table("agenda")->where('office_event_id','=', $event['Id'])->get();
+        //print_r(count($getCount));
+        if(count($getCount) > 0){
+            DB::table('agenda')->where('office_event_id', $event['Id'])->update( ['name' => $event['Subject']], 
+                                                                                ['start_date' =>  $event['Start']['DateTime']],
+                                                                                ['end_date' => $event['End']['DateTime']], 
+                                                                                ['time' =>  $event['Start']['DateTime']],
+                                                                                ['description' => $event['Body']['Content']] 
+                                                        );
+        } else {
+          DB::table('agenda')->insert(array(
+                                      'name' => $event['Subject'], 
+                                      'start_date' =>  $event['Start']['DateTime'],
+                                      'end_date' => $event['End']['DateTime'], 
+                                      'time' =>  $event['Start']['DateTime'],
+                                      'description' => $event['Body']['Content'], 
+                                      'office_event_id' =>  $event['Id']
+                                    )
+          );
+        }
+          
+        ?>
+         
+    <?php    
+      } } ?>
+    <h1>Create a new event</h1>
+    
+    <table>
+        {!! Form::open(array('url' => 'agenda/create', 'method' => 'PUT')) !!}
+             <tr>
+                    <td>Event Name:</td>
+                    <td>{!! Form::text('ename') !!}</td>
+            </tr>
+            <tr>
+                <td>Event Description:</td>
+                <td>{!! Form::textarea('edecs') !!}</td>
+            </tr>
+             <tr>
+                <td>Start Date:</td>
+                <td>{!! Form::input('date', 'start-date') !!}</td>
+            </tr>
+            <tr>
+                <td>End Date:</td>
+                <td>{!! Form::input('date', 'end-date') !!}</td>
+            </tr>
+            <tr>
+                <td colspan="2"> {!! Form::submit('Save', array('class' => 'name')) !!}</td>
+            </tr>
+        {!! Form::close() !!}
+     </table>
+@stop
+

@@ -1,0 +1,54 @@
+<?php
+// Enter your database connection here
+//die('jhg');
+//session_start();
+//  require('../../oauth.php');
+//  require('../../outlook.php');
+// Connection to the database
+
+
+// Select a database to work with
+
+
+// Select timetables table
+//$result = mysql_query("SELECT * FROM events");
+
+//fetch tha data from the database 
+//$fetchevents = OutlookService::getEvents($_SESSION['access_token'], $_SESSION['user_email']);
+
+$events = array();
+//while ($row = mysql_fetch_array($result)) {
+	//$i=1;
+	//foreach($fetchevents['value'] as $eachEvent){
+	$event = new stdClass();
+	$event->name = 'promith';
+	$event->image = '';
+	$event->day = date('j');
+	$event->month = date('n');
+	$event->year = date('y');
+	
+	/*if (!$row{'end_date'} || ($row{'end_date'} == '0000-00-00')) {
+		$event->duration = 1; // If end_time is blank -> event's duration = 1 (day).	
+	} else {
+		if (date('Ymd', strtotime($row{'start_date'})) == date('Ymd', strtotime($row{'end_date'}))) { // If start date and end date are same day -> event's duration = 1 (day).
+			$event->duration = 1;
+		} else {
+			$start_day = date('Y-m-d', strtotime($row{'start_date'}));
+			$end_day = date('Y-m-d', strtotime($row{'end_date'}));
+			$event->duration = ceil(abs(strtotime($end_day) - strtotime($start_day)) / 86400) + 1; // Get event's duration = days between start date and end date.
+		}
+	}*/
+	$event->duration = 1;
+	$event->time = '08:00';
+	$event->color = 1;
+	$event->location = 'India';
+	$event->description = 'Rigo Entertainment presents <br>Corrido Fest 2016';
+	array_push($events, $event);
+//}
+//$i++;
+//}
+echo json_encode($events);
+
+//close the connection
+//mysql_close($dbhandle);
+?>

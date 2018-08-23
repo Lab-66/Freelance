@@ -1,0 +1,110 @@
+<?php
+
+namespace App\Http\Controllers\Users;
+
+use App\Http\Controllers\UserController;
+//use App\Repositories\ContractRepository;
+//use App\Repositories\InvoiceRepository;
+//use App\Repositories\MeetingRepository;
+//use App\Repositories\OpportunityRepository;
+//use App\Repositories\PriceListRepository;
+//use App\Repositories\PriceListVersionRepository;
+//use App\Repositories\QuotationRepository;
+//use Efriandika\LaravelSettings\Facades\Settings;
+//use Sentinel;
+use App\Models\Invoice;
+use App\Http\Requests;
+use Illuminate\Support\Facades\URL;
+use \Input as Input;
+use DB;
+use App\Models\Slider;
+
+class SoapController extends UserController
+{
+	public function soapSetting(){
+		return View('user.soap.index',array('title' => 'Soapkoppeling'));////
+		//return 'Background Slider';
+		/*$arr = DB::table("bg_slider")->orderBy('id', 'asc')->get();
+
+		$upload_html = '<link type="text/css" rel="Stylesheet" href="http://93.158.221.197/files/public/css/secure.css" />
+					<div class="imag-upload">
+						<form action="'. URL::to('slider_upload').'" method="post" enctype="multipart/form-data">
+							<p class="upload-heading">Select image to upload:</p>
+							<input type="file" name="file">
+							<input type="submit" name="submit" value="Save" class="btn btn btn-primary">
+							<input type="hidden" value="'.csrf_token().'" name="_token">
+						</form>
+					</div>';
+		echo $upload_html;
+		$table_html = '<div class="show-img">
+	<table class="post-slide">
+		<tr>
+			<td>#id</td>
+			<td>Image</td>
+			<td>Action</td>
+		</tr>';
+	//$table_html .= '<tr>';
+	foreach($arr as $eachImg){
+	$table_html .= '<tr><td>'.$eachImg->id.'</td>
+				<td><img src="uploads/'.$eachImg->img_path.'" height="60" width="60"></td>
+				<td><a href="img_remove?id='.$eachImg->id.'" class="remove-image"><i class="fa fa-trash"></i>&nbsp;&nbsp;Remove</a></td></tr>';
+		}
+	$table_html .= '</table></div>
+					<style type="text/css">
+						.post-slide{border:none; }
+						.post-slide tr td, .post-slide th td{padding: 20px;}
+						.post-slide tr:first-child td{background: #313E4B; color: #fff; padding: 5px 20px;}
+						.post-slide tr:nth-child(even) td{background:#e8e7e7; }
+						.remove-image{color: #f00;}
+						.imag-upload {float: left; width: 100%; text-align: center; padding: 20px; background: #eed5cb; margin-bottom: 30px; margin-top: 20px;}
+						.imag-upload input{display: inline-block; margin-right: 20px;}
+						.upload-heading{display: inline-block; margin-right: 20px;}
+					</style>
+	';
+	echo $table_html;*/
+	}
+	public function soapFactuur(){
+			$arr = DB::table("invoices")->get();
+			?>
+            <strong>LCRM INVOICES</strong>
+            <table width="100%" border="2">
+            <thead>
+            	<td align="center">Invoice ID</td>
+                <td align="center">Invoice Date</td>
+                <td align="center">Action</td>
+            </thead>
+            <?php foreach($arr as $each){ ?>
+				<tbody>
+                    <td align="center"><?php echo $each->id;?></td>
+                    <td align="center"><?php echo $each->invoice_date;?></td>
+                    <td align="center"><a href="#">Insert Into Soapkoppeling</a></td>
+                </tbody>
+			<?php }	?>
+            </table><br/><br/><br/>
+            <strong>SOAPKOPPELING INVOICES</strong>
+            <br/><i>API key mismatch</i>
+            <?php
+			//print_r($arr);
+	}
+	public function uploadImag(){
+		//print_r('sdf');die();
+		if(Input::hasFile('file')){
+			$file = Input::file('file');
+			$file->move('uploads', $file->getClientOriginalName());
+			/* insert in DB */
+			$slider = new slider;
+			$slider->img_path = $file->getClientOriginalName();
+			$slider->save();
+			//echo '<img src="uploads/'.$file->getClientOriginalName().'" />';
+			//echo "uploaded";
+			header("Location:bg_slider");
+			die();	
+		}
+		
+	}
+	public function removeImag(){
+		DB::table('bg_slider')->where('id', '=', $_GET['id'])->delete();
+		header("Location:bg_slider");
+		die();	
+	}
+}

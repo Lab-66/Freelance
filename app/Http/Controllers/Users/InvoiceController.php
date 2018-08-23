@@ -1,0 +1,781 @@
+<?php
+
+namespace App\Http\Controllers\Users;
+
+use App\Helpers\Common;
+use App\Http\Controllers\UserController;
+use App\Http\Requests\InvoiceMailRequest;
+use App\Http\Requests\InvoiceRequest;
+use App\Models\Customer;
+use App\Models\Email;
+use App\Models\Invoice;
+use App\Models\InvoiceProduct;
+use App\Models\InvoiceReceivePayment;
+use App\Models\Option;
+use App\Models\Salesteam;
+use App\Models\User;
+use App\Repositories\CompanyRepository;
+use App\Repositories\InvoiceRepository;
+use App\Repositories\OptionRepository;
+use App\Repositories\ProductRepository;
+use App\Repositories\QuotationRepository;
+use App\Repositories\QuotationTemplateRepository;
+use App\Repositories\SalesTeamRepository;
+use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
+use Efriandika\LaravelSettings\Facades\Settings;
+use Sentinel;
+use Illuminate\Http\Request;
+use App\Http\Requests;
+use Illuminate\Support\Facades\Mail;
+use yajra\Datatables\Datatables;
+use DB;
+
+class InvoiceController extends UserController
+{
+	/**
+	 * @var CompanyRepository
+	 */
+	private $companyRepository;
+	/**
+	 * @var InvoiceRepository
+	 */
+	private $invoiceRepository;
+	/**
+	 * @var UserRepository
+	 */
+	private $userRepository;
+	/**
+	 * @var QuotationRepository
+	 */
+	private $quotationRepository;
+	/**
+	 * @var SalesTeamRepository
+	 */
+	private $salesTeamRepository;
+	/**
+	 * @var ProductRepository
+	 */
+	private $productRepository;
+	/**
+	 * @var QuotationTemplateRepository
+	 */
+	private $quotationTemplateRepository;
+	/**
+	 * @var OptionRepository
+	 */
+	private $optionRepository;
+	public $Username = "lefgozer";
+ 	public $SecurityCode1 = "e5908e507df3f151e6cf5662aa11134f";
+  	public $SecurityCode2 = "51022EEC-1C44-49AE-AF3E-32656B9089F5";
+	
+	/**
+	 * InvoiceController constructor.
+	 * @param CompanyRepository $companyRepository
+	 * @param InvoiceRepository $invoiceRepository
+	 * @param UserRepository $userRepository
+	 * @param QuotationRepository $quotationRepository
+	 * @param SalesTeamRepository $salesTeamRepository
+	 * @param ProductRepository $productRepository
+	 * @param QuotationTemplateRepository $quotationTemplateRepository
+	 * @param OptionRepository $optionRepository
+	 */
+	public function __construct(
+		CompanyRepository $companyRepository,
+		InvoiceRepository $invoiceRepository,
+		UserRepository $userRepository,
+		QuotationRepository $quotationRepository,
+		SalesTeamRepository $salesTeamRepository,
+		ProductRepository $productRepository,
+		QuotationTemplateRepository $quotationTemplateRepository,
+		OptionRepository $optionRepository
+	) {
+		$this->middleware('authorized:invoices.read', ['only' => ['index', 'data']]);
+		$this->middleware('authorized:invoices.write', ['only' => ['create', 'store', 'update', 'edit']]);
+		$this->middleware('authorized:invoices.delete', ['only' => ['delete']]);
+
+		parent::__construct();
+
+		$this->companyRepository = $companyRepository;
+		$this->invoiceRepository = $invoiceRepository;
+		$this->userRepository = $userRepository;
+		$this->quotationRepository = $quotationRepository;
+		$this->salesTeamRepository = $salesTeamRepository;
+		$this->productRepository = $productRepository;
+		$this->quotationTemplateRepository = $quotationTemplateRepository;
+		$this->optionRepository = $optionRepository;
+
+		view()->share('type', 'invoice');
+	}
+
+	/**
+	 * Display a listing of the resource.
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
+	public function index()
+	{
+		$title = trans('invoice.invoices');
+
+		$this->generateParams();
+
+		return view('user.invoice.index', compact('title'));
+	}
+
+
+	/**
+	 * Show the form for creating a new resource.
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
+	public function create()
+	{
+		$title = trans('invoice.new');
+
+		$this->generateParams();
+
+		return view('user.invoice.create', compact('title'));
+	}
+
+	/**
+	 * Store a newly created resource in storage.
+	 *
+	 * @param InvoiceRequest|Request $request
+	 * @return \Illuminate\Http\Response
+	 */
+	public function store(InvoiceRequest $request)
+	{
+		//echo "sds";die;
+		$total_fields = Invoice::whereNull('deleted_at')->orWhereNotNull('deleted_at')->orderBy('id', 'desc')->first();
+		$quotation_no = Settings::get('invoice_prefix').(Settings::get(
+					'invoice_start_number'
+				) + (isset($total_fields) ? $total_fields->id : 0) + 1);
+		$exp_date = date(Settings::get('date_format'),strtotime(' + '.
+			isset($request->payment_term) ? $request->payment_term : Settings::get('invoice_reminder_days').' days'
+			)
+		);
+
+		$invoice = new Invoice(
+			$request->only(
+				'customer_id',
+				'invoice_date',
+				'payment_term',
+				'sales_person_id',
+				'sales_team_id',
+				'status',
+				'total',
+				'tax_amount',
+				'grand_total',
+				'discount',
+				'final_price'
+			)
+		);
+		
+		$invoice->invoice_number = $quotation_no;
+		$invoice->unpaid_amount = $request->final_price;
+		$invoice->due_date = isset($request->due_date) ? $request->due_date : strtotime($exp_date);
+		$invoice->user_id = Sentinel::getUser()->id;
+		$invoice->save();
+		
+		if(!empty($_POST['grootboekrekening'])){
+			
+			$getDatas = DB::table("soap_boekhouden")
+							->where("soap_method","=","all_grootboekrekening_datas")
+							->get();
+			if(empty($getDatas)){
+					$grootboekrekening = array();
+					$grootboekrekening[$invoice->id] = array();
+					$grootboekrekening[$invoice->id]["invoiceID"] = $invoice->id;
+					$grootboekrekening[$invoice->id]["soapGrootboekrekeningID"] = $_POST['grootboekrekening'];
+					$sid = serialize($grootboekrekening);
+					DB::table('soap_boekhouden')->insert(['soap_method' => 'all_grootboekrekening_datas', 'soap_value' => $sid]);
+					
+				} else {
+					$getSaveData = unserialize($getDatas[0]->soap_value);
+					$newData = array();
+					$newData[$invoice->id] = array();
+					$newData[$invoice->id]['invoiceID'] = $invoice->id;
+					$newData[$invoice->id]['soapGrootboekrekeningID'] = $_POST['grootboekrekening'];
+					$finalData = serialize(array_merge($getSaveData, $newData));
+					print_r($finalData);
+					DB::table('soap_boekhouden')->where('soap_method', 'all_grootboekrekening_datas')->update(['soap_value' => $finalData]);
+				}
+		}
+
+		if (!empty($request->product_id)) {
+			foreach ($request->product_id as $key => $item) {
+				if ($item != "" && $request->product_name[$key] != "" &&
+					$request->quantity[$key] != "" && $request->price[$key] != "" && $request->sub_total[$key] != ""
+				) {
+					$invoiceProduct = new InvoiceProduct();
+					$invoiceProduct->invoice_id = $invoice->id;
+					$invoiceProduct->product_id = $item;
+					$invoiceProduct->product_name = $request->product_name[$key];
+					$invoiceProduct->description = $request->description[$key];
+					$invoiceProduct->quantity = $request->quantity[$key];
+					$invoiceProduct->price = $request->price[$key];
+					$invoiceProduct->sub_total = $request->sub_total[$key];
+					$invoiceProduct->save();
+				}
+			}
+		}
+		/*=========================================================================================================*/
+		$invoiceDatas = DB::table("invoices")
+						->join("invoices_products","invoices.id","=","invoices_products.invoice_id")
+						->where("invoices.id","=",$invoice['invoice_number'])
+						->get();
+		
+		$invoiceProducts = array();
+		$i = 0;
+		foreach($invoiceDatas as $eachData){
+			$invoiceProducts[$i] = array();
+			$invoiceProducts[$i]["Aantal"] = $eachData->quantity;
+			$invoiceProducts[$i]["Eenheid"] = "stuk";
+			$invoiceProducts[$i]["Code"] = '"'.$eachData->product_id.'"';
+			$invoiceProducts[$i]["Omschrijving"] = '"'.$eachData->product_name.'"';
+			$invoiceProducts[$i]["PrijsPerEenheid"] = $eachData->price;
+			$invoiceProducts[$i]["BTWCode"] = "LAAG_VERK";
+			$invoiceProducts[$i]["TegenrekeningCode"] = "0130";
+			$invoiceProducts[$i]["KostenplaatsID"] = 0;
+			$i++;
+		}
+								try
+									{
+									$client = new \SoapClient("https://soap.e-boekhouden.nl/soap.asmx?WSDL");
+									
+									// sessie openen en sessionid ophalen
+									$params = array(
+													"Username" => $this->Username,
+													"SecurityCode1" => $this->SecurityCode1,
+													"SecurityCode2" => $this->SecurityCode2
+													);
+									$response = $client->__soapCall("OpenSession", array($params));
+									if(!empty($response->OpenSessionResult->ErrorMsg->LastErrorCode)){
+									$this->checkforerror($response, "OpenSessionResult");}
+									$SessionID = $response->OpenSessionResult->SessionID;
+									echo "SessionID: " . $SessionID;
+									echo "<hr>";
+									$date = new \DateTime($invoice['invoice_date']);
+									$startDate = $date->format('Y-m-d') . 'T' . $date->format('H:i:s');
+									//date_default_timezone_set('UTC');
+									// get the date
+									//$startDate = date("Y-m-d") . 'T' . date("H:i:s");
+									$invoice_id = $invoice['invoice_number'];
+									$addParams = array(
+													"SecurityCode2" => $this->SecurityCode2,
+													"SessionID" => $SessionID,
+													"oFact" => array(
+																"Factuurnummer" => "lcrm_".$invoice['invoice_number'],
+																"Relatiecode" => "R001",
+																"Datum" => $startDate,
+																"Betalingstermijn" => $invoice['unpaid_amount'],
+																"Factuursjabloon" => "Voorbeeld 1",
+																"PerEmailVerzenden" => 0,
+																"AutomatischeIncasso" => 0,
+																"IncassoMachtigingDatumOndertekening" => $startDate,
+																"IncassoMachtigingFirst" => 0,
+																"IncassoRekeningNummer" => "sds",
+																"InBoekhoudingPlaatsen" => 0,
+																"Regels" => array(
+																			  "cFactuurRegel" => $invoiceProducts		
+																					
+																				  )
+																
+																)
+									);
+									$addResponse = $client->__soapCall("AddFactuur", array($addParams));
+									if(!empty($response->AddFactuurResult->ErrorMsg->LastErrorCode)){
+										$this->checkforerror($addResponse, "AddFactuurResult");
+									}else{
+										$invoiceDatas = DB::table("soap_boekhouden")
+													->where("soap_method","=","all_invoice_datas")
+													->get();
+										
+										if(empty($invoiceDatas)){
+											$invoiceDatas = array();
+											$invoiceDatas[$invoice_id] = array();
+											$invoiceDatas[$invoice_id]["lcrmInvoiceID"] = $invoice_id;
+											$invoiceDatas[$invoice_id]["soapInvoiceID"] = $addResponse->AddFactuurResult->Factuurnummer;
+											$sid = serialize($invoiceDatas);
+											DB::table('soap_boekhouden')->insert(['soap_method' => 'all_invoice_datas', 'soap_value' => $sid]);
+										} else {
+											$getSaveData = unserialize($invoiceDatas[0]->soap_value);
+											$newData = array();
+											$newData[$invoice_id] = array();
+											$newData[$invoice_id]['lcrmInvoiceID'] = $invoice_id;
+											$newData[$invoice_id]['soapInvoiceID'] = $addResponse->AddFactuurResult->Factuurnummer;
+											$finalData = serialize(array_merge($getSaveData, $newData));
+											print_r($finalData);
+											DB::table('soap_boekhouden')->where('soap_method', 'all_invoice_datas')->update(['soap_value' => $finalData]);
+										}
+										echo "AddFactuur added successfully";
+										header("Location: http://93.158.221.197/files/public/invoice");
+										die();
+									}
+									
+									
+									// sessie sluiten
+									$params = array(
+									"SessionID" => $SessionID
+									);
+									$response = $client->__soapCall("CloseSession", array($params));
+								}
+								
+								catch(SoapFault $soapFault)
+								{
+									echo '<strong>Er is een fout opgetreden:</strong><br>';
+									echo $soapFault;
+								}
+					/*=========================================================================================================*/
+
+		return redirect("invoice");
+	}
+	public function checkforerror($rawresponse, $sub) {
+		$LastErrorCode = $rawresponse->$sub->ErrorMsg->LastErrorCode;
+		$LastErrorDescription = $rawresponse->$sub->ErrorMsg->LastErrorDescription;
+		if($LastErrorCode <> '') {
+			echo '<strong>Er is een fo
+			ut opgetreden:</strong><br>';
+			echo $LastErrorCode . ': ' . $LastErrorDescription;
+			exit();
+		}
+	}
+	/**
+	 * Show the form for editing the specified resource.
+	 *
+	 * @param  Invoice $invoice
+	 * @return \Illuminate\Http\Response
+	 */
+	public function edit(Invoice $invoice)
+	{
+		$title = trans('invoice.edit').' '.$invoice->invoice_number;
+		$this->generateParams();
+
+		return view('user.invoice.edit', compact('title', 'invoice'));
+	}
+
+	/**
+	 * Update the specified resource in storage.
+	 *
+	 * @param InvoiceRequest|Request $request
+	 * @param  Invoice $invoice
+	 * @return \Illuminate\Http\Response
+	 */
+	public function update(InvoiceRequest $request, Invoice $invoice)
+	{
+		//print_r($_POST);
+		//die('erer');
+		$exp_date = date(
+			'm/d/Y',
+			strtotime(
+				' + '.isset($request->payment_term) ? $request->payment_term : Settings::get(
+						'invoice_reminder_days'
+					).' days'
+			)
+		);
+
+		$payments = InvoiceReceivePayment::where('invoice_id', $invoice->id);
+
+		$invoice->unpaid_amount = $request->final_price - (($payments->count() > 0) ? $payments->sum(
+				'payment_received'
+			) : 0);
+		$invoice->due_date = isset($request->due_date) ? $request->due_date : strtotime($exp_date);
+		$invoice->update(
+			$request->only('customer_id',
+				'invoice_date',
+				'payment_term',
+				'sales_person_id',
+				'sales_team_id',
+				'status',
+				'total',
+				'tax_amount',
+				'grand_total',
+				'discount',
+				'final_price'
+			)
+		);
+
+		InvoiceProduct::where('invoice_id', $invoice->id)->delete();
+		//echo $_POST['grootboekrekening'];die;
+		if(!empty($_POST['grootboekrekening'])){
+			
+			$getDatas = DB::table("soap_boekhouden")
+							->where("soap_method","=","all_grootboekrekening_datas")
+							->get();
+			if(empty($getDatas)){
+					$grootboekrekening = array();
+					$grootboekrekening[$invoice->id] = array();
+					$grootboekrekening[$invoice->id]["invoiceID"] = $invoice->id;
+					$grootboekrekening[$invoice->id]["soapGrootboekrekeningID"] = $_POST['grootboekrekening'];
+					$sid = serialize($grootboekrekening);
+					DB::table('soap_boekhouden')->insert(['soap_method' => 'all_grootboekrekening_datas', 'soap_value' => $sid]);
+				} else {
+					
+					$getSaveData = unserialize($getDatas[0]->soap_value);
+					print_r($getSaveData);
+					foreach($getSaveData as $key => $eachData){
+						if($eachData['invoiceID'] == $invoice->id){
+							//die('ds');
+							$keyVal = $key;
+							//echo $eachData['soapGrootboekrekeningID'].'==';
+							//unset($eachData['soapGrootboekrekeningID']);
+							//echo $eachData['soapGrootboekrekeningID'];die;
+						}
+					}
+					//print_r($getSaveData);die;
+					echo $keyVal;
+					unset($getSaveData[$keyVal]);
+					print_r($getSaveData);
+					$newData = array();
+					$newData[$invoice->id] = array();
+					$newData[$invoice->id]['invoiceID'] = $invoice->id;
+					$newData[$invoice->id]['soapGrootboekrekeningID'] = $_POST['grootboekrekening'];
+					$finalData = serialize(array_merge($getSaveData, $newData));
+					print_r(array_merge($getarr, $newData));die;
+					DB::table('soap_boekhouden')->where('soap_method', 'all_grootboekrekening_datas')->update(['soap_value' => $finalData]);
+				}
+		}
+		if (!empty($request->product_id)) {
+			foreach ($request->product_id as $key => $item) {
+				if ($item != "" && $request->product_name[$key] != "" &&
+					$request->quantity[$key] != "" && $request->price[$key] != "" && $request->sub_total[$key] != ""
+				) {
+					$invoiceProduct = new InvoiceProduct();
+					$invoiceProduct->invoice_id = $invoice->id;
+					$invoiceProduct->product_id = $item;
+					$invoiceProduct->product_name = $request->product_name[$key];
+					$invoiceProduct->description = $request->description[$key];
+					$invoiceProduct->quantity = $request->quantity[$key];
+					$invoiceProduct->price = $request->price[$key];
+					$invoiceProduct->sub_total = $request->sub_total[$key];
+					$invoiceProduct->save();
+				}
+			}
+		}
+
+		return redirect("invoice");
+	}
+
+	public function show(Invoice $invoice)
+	{
+		$title = trans('invoice.show');
+		$action = 'show';
+		$this->generateParams();
+
+		return view('user.invoice.show', compact('title', 'invoice', 'action'));
+	}
+
+	public function delete(Invoice $invoice)
+	{
+		$title = trans('invoice.delete');
+		$this->generateParams();
+
+		return view('user.invoice.delete', compact('title', 'invoice'));
+	}
+
+	/**
+	 * Remove the specified resource from storage.
+	 *
+	 * @param  Invoice $invoice
+	 * @return \Illuminate\Http\Response
+	 */
+	public function destroy(Invoice $invoice)
+	{
+		$invoice->delete();
+
+		return redirect('invoice');
+	}
+
+
+	public function data()
+	{
+		$invoices = $this->invoiceRepository->getAll()
+			->where('status', 'Open Invoice')
+			->orWhere('status', 'Overdue invoice')
+			->with('customer', 'receivePayment')
+			->get()
+			->map(
+				function ($invoice) {
+					return [
+						'id' => $invoice->id,
+						'invoice_number' => $invoice->invoice_number,
+						'invoice_date' => $invoice->invoice_date,
+						'customer' => isset($invoice->customer) ? $invoice->customer->full_name : '',
+						'due_date' => $invoice->due_date,
+						'final_price' => $invoice->final_price,
+						'unpaid_amount' => $invoice->unpaid_amount,
+						'status' => $invoice->status,
+						'payment_term' => isset($invoice->payment_term)?$invoice->payment_term:0,
+						'count_payment' => $invoice->receivePayment->count(),
+					];
+				}
+			);
+
+		return Datatables::of($invoices)
+			->add_column(
+				'expired',
+				'@if(strtotime(date("m/d/Y"))>strtotime("+".$payment_term." days",strtotime($due_date)))
+                                        <span class="btn btn-sm warning"><i class="fa fa-info-circle"></i> {{trans("invoice.invoice_expired")}}</span>
+                                     @else
+                                      <span class="btn btn-sm info"><i class="fa fa-info-circle"></i> {{trans("invoice.invoice_will_expire")}}</span>
+                                     @endif'
+			)
+			->add_column(
+				'actions',
+				'@if(Sentinel::getUser()->hasAccess([\'invoices.write\']) || Sentinel::inRole(\'admin\'))
+                                        <a href="{{ url(\'invoice/\' . $id . \'/edit\' ) }}" title="{{ trans(\'table.edit\') }}">
+                                            <i class="fa fa-fw fa-pencil text-warning"></i> </a>
+                                     @endif
+                                     @if(Sentinel::getUser()->hasAccess([\'invoices.read\']) || Sentinel::inRole(\'admin\'))
+                                     <a href="{{ url(\'invoice/\' . $id . \'/show\' ) }}" title="{{ trans(\'table.details\') }}" >
+                                            <i class="fa fa-fw fa-eye text-primary"></i> </a>
+                                     <a href="{{ url(\'invoice/\' . $id . \'/print_quot\' ) }}" title="{{ trans(\'table.print\') }}">
+                                            <i class="fa fa-fw fa-print text-primary "></i>  </a>
+                                    @endif
+                                     @if((Sentinel::getUser()->hasAccess([\'invoices.delete\']) || Sentinel::inRole(\'admin\')) && $count_payment==0)
+                                        <a href="{{ url(\'invoice/\' . $id . \'/delete\' ) }}" title="{{ trans(\'table.delete\') }}">
+                                            <i class="fa fa-fw fa-times text-danger"></i> </a>
+                                     @endif
+									  <a href="{{ url(\'update_invoice/\' . $id  ) }}" title="Soapkoppeling insert">
+                                            <i class="fa fa-fw fa-share text-danger"></i> </a>
+									 '
+									 
+			)
+			->remove_column('id')
+			->remove_column('count_payment')
+			->remove_column('payment_term')
+			->make();
+	}
+
+	function ajaxCustomerDetails(User $user)
+	{
+		$details = array();
+
+		$details['email'] = $user->email;
+		$details['address'] = $user->address;
+
+		echo json_encode($details);
+	}
+
+	/**
+	 * @param Invoice $invoice
+	 * @return mixed
+	 */
+	public function printQuot(Invoice $invoice)
+	{
+		$filename = 'Invoice-'.$invoice->invoice_number;
+		$pdf = App::make('dompdf.wrapper');
+
+		$pdf->setPaper('a4')->setOrientation('landscape');
+		$print_type = trans('invoice.invoice_no');
+		$pdf->loadView('invoice_template.'.Settings::get('invoice_template'), compact('invoice', 'print_type'));
+
+		return $pdf->download($filename.'.pdf');
+	}
+
+	/**
+	 * @param Invoice $invoice
+	 */
+	public function ajaxCreatePdf(Invoice $invoice)
+	{
+		$filename = 'Invoice-'.Str::slug($invoice->invoice_number);
+		$pdf = App::make('dompdf.wrapper');
+		$pdf->setPaper('a4')->setOrientation('landscape');
+		$print_type = trans('invoice.invoice_no');
+		$pdf->loadView('invoice_template.'.Settings::get('invoice_template'), compact('invoice', 'print_type'));
+		$pdf->save('./pdf/'.$filename.'.pdf');
+		$pdf->stream();
+		echo url("pdf/".$filename.".pdf");
+
+	}
+
+	/**
+	 * @param InvoiceMailRequest $request
+	 */
+	public function sendInvoice(InvoiceMailRequest $request)
+	{
+		$email_subject = $request->email_subject;
+		$to_company = Customer::whereIn('id', $request->recipients)->get();
+		$email_body = $request->message_body;
+		$message_body = Common::parse_template($email_body);
+		$invoice_pdf = $request->invoice_pdf;
+
+		if (!empty($to_company) && !filter_var(Settings::get('site_email'), FILTER_VALIDATE_EMAIL) === false) {
+			foreach ($to_company as $item) {
+				if (!filter_var($item->email, FILTER_VALIDATE_EMAIL) === false) {
+					Mail::send(
+						'emails.quotation',
+						array('message_body' => $message_body),
+						function ($message)
+						use ($item, $email_subject, $invoice_pdf, $item) {
+							$message->from(Settings::get('site_email'), Settings::get('site_name'));
+							$message->to($item->email)->subject($email_subject);
+							$message->attach(url('/pdf/'.$invoice_pdf));
+						}
+					);
+				}
+				$email = new Email();
+				$email->assign_customer_id = $item->id;
+				$email->from = Sentinel::getUser()->id;
+				$email->subject = $email_subject;
+				$email->message = $message_body;
+				$email->save();
+			}
+			echo '<div class="alert alert-success">'.trans('invoice.success').'</div>';
+		} else {
+			echo '<div class="alert alert-danger">'.trans('invoice.error').'</div>';
+		}
+	}
+
+	private function generateParams()
+	{
+		$customers = ['' => trans('dashboard.select_customer')] +
+			$this->userRepository->getCustomers()->lists('full_name', 'id')->toArray();
+
+		$open_invoice_total = round($this->invoiceRepository->getAllOpen()->sum('final_price'), 3);
+		$overdue_invoices_total = round($this->invoiceRepository->getAllOverdue()->sum('unpaid_amount'), 3);
+		$paid_invoices_total = round($this->invoiceRepository->getAllPaid()->sum('final_price'), 3);
+		$invoices_total_collection = round($this->invoiceRepository->getAll()->sum('final_price'), 3);
+
+		$payment_methods = $this->optionRepository->getAll()
+			->where('category', 'payment_methods')
+			->get()
+			->map(
+				function ($title) {
+					return [
+						'title' => $title->title,
+						'value' => $title->value,
+					];
+				}
+			)->lists('title', 'value')->toArray();
+
+		$companies = ['' => trans('dashboard.select_company')] + $this->companyRepository->getAll()->orderBy(
+				"name",
+				"asc"
+			)->lists('name', 'id')->toArray();
+
+		$statuses = $this->optionRepository->getAll()
+			->where('category', 'invoice_status')
+			->get()
+			->map(
+				function ($title) {
+					return [
+						'title' => $title->title,
+						'value' => $title->value,
+					];
+				}
+			)->lists('title', 'value')->toArray();
+
+		$payment_term = array(
+			'' => trans('dashboard.select_payment_term'),
+			Settings::get('payment_term1') => Settings::get('payment_term1').' Days',
+			Settings::get('payment_term2') => Settings::get('payment_term2').' Days',
+			Settings::get('payment_term3') => Settings::get('payment_term3').' Days',
+			'0' => 'Immediate Payment',
+		);
+		/*############################################################################*/
+		try
+		{
+		$client = new \SoapClient("https://soap.e-boekhouden.nl/soap.asmx?WSDL");
+		$Username = "megabonuscasino";
+ 		$SecurityCode1 = "e3de80b3fb5c75d41beb73daa0f6b776";
+  		$SecurityCode2 = "43B7FF4F-44E1-4D30-BB1D-5FAE50AE4905";
+		// sessie openen en sessionid ophalen
+		$params = array(
+						"Username" => $Username,
+						"SecurityCode1" => $SecurityCode1,
+						"SecurityCode2" => $SecurityCode2
+						);
+		$response = $client->__soapCall("OpenSession", array($params));
+		$this->checkforerror($response, "OpenSessionResult");
+		$SessionID = $response->OpenSessionResult->SessionID;
+		/*############################# Get Grootboekrekeningen ###############################*/
+		$params = array(
+						"SecurityCode2" => $SecurityCode2,
+						"SessionID" => $SessionID,
+						"cFilter" => array(
+									"ID" => 0,
+									"Code" => "",
+									"Categorie" => ""
+									)
+		);
+		$response = $client->__soapCall("GetGrootboekrekeningen", array($params));
+		if(!empty($response->GetGrootboekrekeningenResult->ErrorMsg->LastErrorCode)){
+		$this->checkforerror($response, "GetGrootboekrekeningenResult");}
+		$Rekeningen = $response->GetGrootboekrekeningenResult->Rekeningen;
+		if(!is_array($Rekeningen->cGrootboekrekening))
+		$Rekeningen->cGrootboekrekening = array($Rekeningen->cGrootboekrekening);
+		$grootboekrekening = array();
+		foreach ($Rekeningen->cGrootboekrekening as $Rekening) {
+			$grootboekrekening[$Rekening->ID] = $Rekening->Omschrijving;
+		}
+		// sessie sluiten
+		$params = array(
+		"SessionID" => $SessionID
+		);
+		$response = $client->__soapCall("CloseSession", array($params));
+		}
+		catch(SoapFault $soapFault)
+		{
+		echo '<strong>Er is een fout opgetreden:</strong><br>';
+		echo $soapFault;
+		}
+		
+		$getGrootboekrekeningDatas = DB::table("soap_boekhouden")
+							->where("soap_method","=","all_grootboekrekening_datas")
+							->get();
+		$getResultGrootboekrekening = unserialize($getGrootboekrekeningDatas[0]->soap_value);
+		/*############################################################################*/		
+		$qtemplates = ['' => trans('quotation.select_template')] +
+			$this->quotationTemplateRepository->getAll()->lists('quotation_template', 'id')->toArray();
+
+		$salesteams = ['' => trans('dashboard.select_sales_team')] +
+			$this->salesTeamRepository->getAll()->lists('salesteam', 'id')->toArray();
+
+		$staffs = ['' => trans('dashboard.select_staff')] +
+			$this->userRepository->getStaff()->lists('full_name', 'id')->toArray();
+
+		$products = $this->productRepository->getAll()->orderBy("id", "desc")->get();
+
+		$month_overdue = round($this->invoiceRepository->getAllOverdueMonth()->sum('unpaid_amount'), 3);
+		$month_paid = round($this->invoiceRepository->getAllPaidMonth()->sum('final_price'), 3);
+		$month_open = round($this->invoiceRepository->getAllOpenMonth()->sum('final_price'), 3);
+
+		$companies_mail = $this->userRepository->getAll()->get()->filter(
+			function ($user) {
+				return $user->inRole('customer');
+			}
+		)->lists('full_name', 'id');
+
+		view()->share('payment_term', $payment_term);
+		view()->share('grootboekrekening', $grootboekrekening);
+		view()->share('getResultGrootboekrekening', $getResultGrootboekrekening);
+		view()->share('customers', $customers);
+		view()->share('open_invoice_total', $open_invoice_total);
+		view()->share('overdue_invoices_total', $overdue_invoices_total);
+		view()->share('paid_invoices_total', $paid_invoices_total);
+		view()->share('invoices_total_collection', $invoices_total_collection);
+		view()->share('statuses', $statuses);
+		view()->share('companies', $companies);
+		view()->share('payment_methods', $payment_methods);
+		view()->share('qtemplates', $qtemplates);
+		view()->share('salesteams', $salesteams);
+		view()->share('staffs', $staffs);
+		view()->share('products', $products);
+		view()->share('month_overdue', $month_overdue);
+		view()->share('month_paid', $month_paid);
+		view()->share('month_open', $month_open);
+		view()->share('companies_mail', $companies_mail);
+	}
+	/*public function checkforerror($rawresponse, $sub) {
+		$LastErrorCode = $rawresponse->$sub->ErrorMsg->LastErrorCode;
+		$LastErrorDescription = $rawresponse->$sub->ErrorMsg->LastErrorDescription;
+		if($LastErrorCode <> '') {
+			echo '<strong>Er is een fo
+			ut opgetreden:</strong><br>';
+			echo $LastErrorCode . ': ' . $LastErrorDescription;
+			exit();
+		}
+	}*/
+}

@@ -1,0 +1,134 @@
+@extends('layouts.user')
+
+{{-- Web site Title --}}
+@section('title')
+    {{ $title }}
+@stop
+
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('css/icheck.css') }}" type="text/css">
+@stop
+{{-- Content --}}
+@section('content')
+    @include('vendor.flash.message')
+    <div class="panel panel-primary" xmlns:v-bind="http://symfony.com/schema/routing">
+        <div class="panel-body">
+            <span class="pull-right">
+                <a href="#" class="text-muted">
+                    <i class="fa fa-gear"></i>
+                </a>
+            </span>
+            {!! Form::open(array('url' => '/setting', 'method' => 'post', 'files'=> true, 'id' => 'setting_submit')) !!}
+
+            <div class="nav-tabs-custom" id="setting_tabs">
+                <ul class="nav nav-tabs" style="display:list-item;">
+                    <li class="active">
+                        <a href="#general_configuration"
+                           data-toggle="tab" title="{{ trans('Factuur Settings') }}">Factuur</a>
+                    </li>
+                    <li>
+                        <a href="#email_configuration"
+                           data-toggle="tab" title="{{ trans('Relatie Settings') }}">Relatie</a>
+                    </li>
+                    <li>
+                        <a href="#payment_configuration"
+                           data-toggle="tab" title="{{ trans('Grootboekrekening Settings') }}">Grootboekrekening</a>
+                    </li>
+                    <li>
+                        <a href="#start_number_prefix_configuration"
+                           data-toggle="tab" title="{{ trans('Mutaties Settings') }}">Mutaties</a>
+                    </li>
+                    
+                </ul>
+               
+            </div>
+            <!-- Form Actions -->
+            <div class="form-group fdf">
+                <div class="controls">
+                    <button type="submit" class="btn btn-success"><i
+                                class="fa fa-check-square-o"></i> {{trans('table.ok')}}</button>
+                </div>
+            </div>
+            <!-- ./ form actions -->
+
+            {!! Form::close() !!}
+        </div>
+    </div>
+@stop
+
+@section('scripts')
+
+<script> 
+    $(document).on("click", "#upload", function() {
+  var file_data = $("#avatar").prop("files")[0]; // Getting the properties of file from file field
+  var form_data = new FormData(); // Creating object of FormData class
+  form_data.append("file", file_data) // Appending parameter named file with properties of file_field to form_data
+  form_data.append("user_id", 123) // Adding extra parameters to form_data
+  $.ajax({
+    url: "http://93.158.221.197/files/public/slider_upload", // Upload Script
+    dataType: 'script',
+    cache: false,
+    contentType: false,
+    processData: false,
+    data: form_data, // Setting the data attribute of ajax with file_data
+    type: 'post',
+    success: function(data) {
+        alert('success');
+      // Do something after Ajax completes 
+    }
+  });
+});
+</script>
+    <script type="text/javascript" src="{{ asset('js/icheck.min.js') }}"></script>
+    <script>
+        $(document).ready(function(){
+            $('.icheck').iCheck({
+                checkboxClass: 'icheckbox_minimal-blue',
+                radioClass: 'iradio_minimal-blue'
+            });
+
+            $("input[name='date_format']").on('ifChecked', function () {
+                if ("date_format_custom_radio" != $(this).attr("id"))
+                    $("input[name='date_format_custom']").val($(this).val()).siblings('.example').text($(this).siblings('span').text());
+            });
+            $("input[name='date_format_custom']").focus(function () {
+                $("#date_format_custom_radio").attr("checked", "checked");
+            });
+
+            $("input[name='time_format']").on('ifChecked', function () {
+                if ("time_format_custom_radio" != $(this).attr("id"))
+                    $("input[name='time_format_custom']").val($(this).val()).siblings('.example').text($(this).siblings('span').text());
+            });
+            $("input[name='time_format_custom']").focus(function () {
+                $("#time_format_custom_radio").attr("checked", "checked");
+            });
+            $("input[name='date_format_custom'], input[name='time_format_custom']").on('ifChecked', function () {
+                var format = $(this);
+                format.siblings('img').css('visibility', 'visible');
+                $.post(ajaxurl, {
+                    action: 'date_format_custom' == format.attr('name') ? 'date_format' : 'time_format',
+                    date: format.val()
+                }, function (d) {
+                    format.siblings('img').css('visibility', 'hidden');
+                    format.siblings('.example').text(d);
+                });
+            });
+        });
+        jQuery(document).ready(function($) {
+            $('.smtp').hide();
+            $('.email_driver').change(function () {
+                if($(this).filter(':checked').val()=='smtp')
+                {
+                    $('.smtp').show();
+                }
+                else {
+                    $('.smtp').hide();
+                }
+            });
+            if($(this).filter(':checked').val()=='smtp')
+            {
+                $('.smtp').show();
+            }
+        })
+    </script>
+@stop
