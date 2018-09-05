@@ -1,0 +1,67 @@
+
+
+<?php /* Web site Title */ ?>
+<?php $__env->startSection('title'); ?>
+    <?php echo e($title); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php /* Content */ ?>
+<?php $__env->startSection('content'); ?>
+    <div class="page-header clearfix">
+        <div class="col-sm-2 box">
+            <div class="txt"><b><?php echo e(trans('invoice.open_invoice')); ?></b></div>
+            <div class="number c-green">$<?php echo e($open_invoice_total); ?> </div>
+        </div>
+        <div class="col-sm-2 box">
+            <div class="txt"><b><?php echo e(trans('invoice.overdue_invoice')); ?></b></div>
+            <div class="number c-red">$<?php echo e($overdue_invoices_total); ?> </div>
+        </div>
+        <div class="col-sm-2 box">
+            <div class="txt"><b><?php echo e(trans('invoice.paid_invoice')); ?></b></div>
+            <div class="number c-blue">$<?php echo e($paid_invoices_total); ?> </div>
+        </div>
+        <div class="col-sm-2 box">
+            <div class="txt"><b><?php echo e(trans('invoice.invoices_total')); ?></b></div>
+            <div class="number c-red">$<?php echo e($invoices_total_collection); ?> </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <i class="material-icons">web</i>
+                <?php echo e($title); ?>
+
+            </h4>
+                                <span class="pull-right">
+                                    <i class="fa fa-fw fa-chevron-up clickable"></i>
+                                    <i class="fa fa-fw fa-times removepanel clickable"></i>
+                                </span>
+        </div>
+        <div class="panel-body">
+
+        <table id="data" class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th><?php echo e(trans('invoice.invoice_number')); ?></th>
+                <th><?php echo e(trans('invoice.invoice_date')); ?></th>
+                <th><?php echo e(trans('invoice.customer')); ?></th>
+                <th><?php echo e(trans('invoice.due_date')); ?></th>
+                <th><?php echo e(trans('invoice.unpaid_amount')); ?></th>
+                <th><?php echo e(trans('invoice.status')); ?></th>
+                <th><?php echo e(trans('invoice.expired')); ?></th>
+                <th><?php echo e(trans('table.actions')); ?></th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+<?php $__env->stopSection(); ?>
+
+<?php /* Scripts */ ?>
+<?php $__env->startSection('scripts'); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.user', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

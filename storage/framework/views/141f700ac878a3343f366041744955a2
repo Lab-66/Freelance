@@ -1,0 +1,46 @@
+
+<?php $__env->startSection('content'); ?>
+    <?php echo $__env->make('install.steps', ['steps' => [
+        'welcome' => 'selected done',
+        'requirements' => 'selected done',
+        'permissions' => 'selected done',
+        'database' => 'selected'
+    ]], array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+    <?php echo $__env->make('layouts.messages', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+
+    <?php echo Form::open(array('url' =>  'install/start-installation', 'method' => 'post')); ?>
+
+        <div class="step-content" style="padding-left: 15px; padding-top: 15px; padding-right: 15px">
+            <h3><?php echo e(trans('install.database_info')); ?></h3>
+            <hr>
+            <div class="form-group">
+                <label for="host"><?php echo e(trans('install.host')); ?></label>
+                <input type="text" class="form-control" id="host" name="host" value="<?php echo e(old('host')); ?>">
+                <small><?php echo e(trans('install.host_info')); ?></small>
+            </div>
+            <div class="form-group">
+                <label for="username"><?php echo e(trans('install.username')); ?></label>
+                <input type="text" class="form-control" id="username" name="username" value="<?php echo e(old('username')); ?>">
+                <small><?php echo e(trans('install.username_info')); ?></small>
+            </div>
+            <div class="form-group">
+                <label for="password"><?php echo e(trans('install.password')); ?></label>
+                <input type="password" class="form-control" id="password" name="password">
+                <small><?php echo e(trans('install.password_info')); ?></small>
+            </div>
+            <div class="form-group">
+                <label for="database"><?php echo e(trans('install.database')); ?></label>
+                <input type="text" class="form-control" id="database" name="database"  value="<?php echo e(old('database')); ?>">
+                <small><?php echo e(trans('install.database_info2')); ?></small>
+            </div>
+            <button class="btn btn-green pull-right">
+                <?php echo e(trans('install.next')); ?>
+
+                <i class="fa fa-arrow-right" style="margin-left: 6px"></i>
+            </button>
+            <div class="clearfix"></div>
+        </div>
+    <?php echo Form::close(); ?>
+
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.install', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

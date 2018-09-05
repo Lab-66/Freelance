@@ -1,0 +1,23 @@
+
+
+<?php /* Web site Title */ ?>
+<?php $__env->startSection('title'); ?>
+    <?php echo e($title); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php /* Content */ ?>
+<?php $__env->startSection('content'); ?>
+
+    <contacts :companies="<?php echo e(json_encode($companies)); ?>"
+              :item="<?php echo e($customers->first()); ?>"
+              url="<?php echo e(url('customer')); ?>/"></contacts>
+
+<?php $__env->stopSection(); ?>
+
+<?php /* Scripts */ ?>
+<?php $__env->startSection('scripts'); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.user', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

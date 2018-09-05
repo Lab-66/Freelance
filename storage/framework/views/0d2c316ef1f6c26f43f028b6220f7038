@@ -1,0 +1,198 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <?php if(isset($user)): ?>
+            <?php echo Form::model($user, array('url' => $type . '/' . $user->id, 'method' => 'put', 'files'=> true)); ?>
+
+        <?php else: ?>
+            <?php echo Form::open(array('url' => $type, 'method' => 'post', 'files'=> true)); ?>
+
+        <?php endif; ?>
+        <div class="form-group required <?php echo e($errors->has('first_name') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('first_name', trans('customer.first_name'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('first_name', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('first_name', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('last_name') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('last_name', trans('customer.last_name'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('last_name', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('last_name', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <?php echo Form::label('language', trans('Language'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('language', null, array('class' => 'form-control')); ?>
+
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('website') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('website', trans('customer.website'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('website', (isset($user))?$user->customer->website:null, array('class' => 'form-control', 'data-fv-uri'=>'true')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('website', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('address') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('address', trans('customer.address'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::textarea('address', (isset($user))?$user->customer->address:null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('address', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('job_position') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('job_position', trans('customer.job_position'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('job_position', (isset($user))?$user->customer->job_position:null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('job_position', ':message')); ?></span>
+            </div>
+        </div>
+        
+        <div class="form-group required <?php echo e($errors->has('phone_number') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('phone_number', trans('customer.phone'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('phone_number', (isset($user))?$user->phone_number:null, array('class' => 'form-control','data-fv-integer' => 'true')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('phone_number', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('mobile') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('mobile', trans('customer.mobile'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('mobile', (isset($user))?$user->customer->mobile:null, array('class' => 'form-control','data-fv-integer' => 'true')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('mobile', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('fax') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('fax', trans('customer.fax'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('fax', (isset($user))?$user->customer->fax:null, array('class' => 'form-control','data-fv-integer' => 'true')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('fax', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('title') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('title', trans('customer.title'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('title', $titles, (isset($user))?$user->customer->title:null, array('id'=>'title', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('title', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('company_id') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('company', trans('customer.company'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('company_id', $companies, (isset($user))?$user->customer->company_id:null, array('id'=>'company_id', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('company_id', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('sales_team_id') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('sales_team_id', trans('customer.sales_team_id'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('sales_team_id', $salesteams, (isset($user))?$user->customer->sales_team_id:null, array('id'=>'sales_team_id', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('sales_team_id', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('email') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('email', trans('customer.email'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::email('email', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('email', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('password') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('password', trans('customer.password'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::password('password', array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('password', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('password_confirmation') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('password_confirmation', trans('customer.password_confirmation'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::password('password_confirmation', array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('password_confirmation', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" value="1" name="status"
+                       <?php if(isset($user->customer) && $user->customer->status==1): ?>checked <?php endif; ?>><i
+                        class="primary"></i> <?php echo e(trans('customer.status')); ?>
+
+            </label>
+        </div>
+            <div class="form-group required <?php echo e($errors->has('user_avatar_file') ? 'has-error' : ''); ?>">
+                <?php echo Form::label('user_avatar_file', trans('customer.customer_avatar'), array('class' => 'control-label')); ?>
+
+                <div class="controls row" v-image-preview>
+                    <div class="col-sm-2">
+                        <?php if(isset($user->user_avatar) && $user->user_avatar!=""): ?>
+                            <img src="<?php echo e(url('uploads/avatar/thumb_'.$user->user_avatar)); ?>"
+                                 alt="Image">
+                        <?php endif; ?>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                            <div class="fileinput-preview thumbnail" data-trigger="fileinput"
+                                 style="width: 200px; height: 150px;">
+                                <img id="image-preview" width="300">
+                            </div>
+                            <div>
+                        <span class="btn btn-default btn-file"><span
+                                    class="fileinput-new"><?php echo e(trans('dashboard.select_image')); ?></span>
+                            <span class="fileinput-exists"><?php echo e(trans('dashboard.change')); ?></span>
+                            <input type="file" name="user_avatar_file"></span>
+                                <a href="#" class="btn btn-default fileinput-exists"
+                                   data-dismiss="fileinput"><?php echo e(trans('dashboard.remove')); ?></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <span class="help-block"><?php echo e($errors->first('user_avatar_file', ':message')); ?></span>
+                    </div>
+                </div>
+            </div>
+        <!-- Form Actions -->
+        <div class="form-group">
+            <div class="controls">
+                <a href="<?php echo e(route($type.'.index')); ?>" class="btn btn-primary"><i
+                            class="fa fa-arrow-left"></i> <?php echo e(trans('table.back')); ?></a>
+                <button type="submit" class="btn btn-success"><i
+                            class="fa fa-check-square-o"></i> <?php echo e(trans('table.ok')); ?></button>
+            </div>
+        </div>
+        <!-- ./ form actions -->
+
+        <?php echo Form::close(); ?>
+
+    </div>
+</div>

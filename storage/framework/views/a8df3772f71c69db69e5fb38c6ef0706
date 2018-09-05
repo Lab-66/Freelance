@@ -1,0 +1,31 @@
+
+<?php if(isset ($errors) && count($errors) > 0): ?>
+    <div class="alert alert-danger alert-notification">
+        <ul>
+            <?php foreach($errors->all() as $error): ?>
+                <li><?php echo e($error); ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
+
+<?php if(Session::get('success', false)): ?>
+    <?php $data = Session::get('success'); ?>
+    <?php if(is_array($data)): ?>
+        <?php foreach($data as $msg): ?>
+            <div class="alert alert-success alert-notification">
+                <i class="fa fa-check"></i>
+                <?php echo e($msg); ?>
+
+                <button type="button" class="close" aria-hidden="true">&times;</button>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="alert alert-success alert-notification">
+            <i class="fa fa-check"></i>
+            <?php echo e($data); ?>
+
+            <button type="button" class="close" aria-hidden="true">&times;</button>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>

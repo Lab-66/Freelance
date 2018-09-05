@@ -1,0 +1,34 @@
+<div class="row">
+
+    <?php foreach(app('App\Social\SocialManager')->getProviders() as $providerKey => $provider): ?>
+    <div class="col-md-12">
+        <legend><?php echo e($provider->getRequiredSettings()['title']); ?></legend>
+        <div class="col-md-6">
+            <?php foreach($provider->getRequiredSettings()['settings'] as $setting): ?>
+            <div class="form-group required <?php echo e($errors->has($setting['id']) ? 'has-error' : ''); ?>">
+                <?php echo Form::label($setting['id'], $setting['title'], array('class' => 'control-label')); ?>
+
+                <div class="controls">
+                    <?php echo Form::text($setting['id'], old($setting['id'], Settings::get($setting['id'])), array('class' => 'form-control')); ?>
+
+                    <span class="help-block"><?php echo e($errors->first($setting['id'], ':message')); ?></span>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="col-md-6">
+        <?php if($provider->isInitialized()): ?>
+                <?php if(!$provider->isLoggedIn()): ?>
+                    <a href="<?php echo e($provider->getLoginUrl()); ?>"><?php echo e(trans('social.login.admin', ['social' => $providerKey])); ?></a>
+                <?php else: ?>
+                    <a href="<?php echo e(route('social.logout', [$providerKey])); ?>">Logout of <?php echo e($providerKey); ?></a>
+                    <?php if(view()->exists('user.setting.social.'.$providerKey)): ?>
+                        <?php echo $__env->make('user.setting.social.'.$providerKey, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+                    <?php endif; ?>
+                <?php endif; ?>
+        <?php endif; ?>
+        </div>
+    </div>
+    <?php endforeach; ?>
+
+</div>

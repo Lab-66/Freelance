@@ -1,0 +1,47 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+    <?php if(isset($id)): ?>
+    	<?php echo Form::open(array('url' => $type.'/'.$id.'/update', 'method' => 'post')); ?>
+
+    <?php else: ?>
+    	<?php echo Form::open(array('url' => $type.'/store', 'method' => 'post')); ?>
+
+    <?php endif; ?>
+        
+        <!--<form method="POST" action="http://full.url/here" accept-charset="UTF-8">
+			<input name="_token" type="hidden" value="somelongrandom string">-->
+       	<div class="form-group">
+            <?php echo Form::label('name', trans('Name'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('name', isset($name) ?$name:null, array('class' => 'form-control')); ?>
+
+            </div>
+        </div>
+        
+         <div class="form-group">
+            <?php echo Form::label('content', trans('Content'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::textarea('content', isset($content) ?$content:null, array('class' => 'form-control')); ?>
+
+            </div>
+        </div>
+        <div class="form-group" style="display:none">
+            <div class="controls">
+            	<?php echo Form::text('date', isset($date) ?$date:date("d-m-Y"), array('class' => 'form-control')); ?>
+
+            </div>
+        </div>
+        
+         <div class="form-group">
+            <div class="controls">
+                <?php echo Form::submit('Click Me!');; ?>
+
+                <!--<button type="submit" class="btn btn-success"><i class="fa fa-check-square-o"></i> <?php echo e(trans('table.ok')); ?></button>-->
+            </div>
+        </div>
+        <?php echo Form::close(); ?>
+
+    </div>
+</div>

@@ -1,0 +1,99 @@
+
+<?php $__env->startSection('content'); ?>
+    <?php echo $__env->make('install.steps', ['steps' => [
+        'welcome' => 'selected done',
+        'requirements' => 'selected done',
+        'permissions' => 'selected done',
+        'database' => 'selected done',
+        'disable' => 'selected done',
+        'settings' => 'selected ',
+    ]], array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+    <?php echo $__env->make('layouts.messages', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+    <?php echo Form::open(array('url' =>  'install/settings', 'method' => 'post')); ?>
+
+    <div class="step-content" style="padding-left: 15px; padding-top: 15px">
+        <h3><?php echo e(trans('install.settings')); ?></h3>
+        <hr>
+        <div class="form-group required <?php echo e($errors->has('site_name') ? 'has-error' : ''); ?>">
+            <label for="site_name"><?php echo e(trans('install.site_name')); ?></label>
+            <div class="controls">
+                <?php echo Form::text('site_name', old('site_name'),array('class' => 'form-control')); ?>
+
+                <small><?php echo e(trans('install.site_name_info')); ?></small>
+                <span class="help-block"><?php echo e($errors->first('site_name', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('site_email') ? 'has-error' : ''); ?>">
+            <label for="site_email"><?php echo e(trans('install.site_email')); ?></label>
+            <div class="controls">
+                <?php echo Form::text('site_email', old('site_email'),array('class' => 'form-control')); ?>
+
+                <small><?php echo e(trans('install.site_email_info')); ?></small>
+                <span class="help-block"><?php echo e($errors->first('site_email', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('currency') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('currency', trans('settings.currency'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('currency', $currency, old('currency'), array('id'=>'currency','class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('currency', ':message')); ?></span>
+            </div>
+        </div>
+        <hr>
+        <div class="form-group required <?php echo e($errors->has('first_name') ? 'has-error' : ''); ?>">
+            <label for="first_name"><?php echo e(trans('install.first_name')); ?></label>
+            <div class="controls">
+                <?php echo Form::text('first_name', old('first_name'),array('class' => 'form-control')); ?>
+
+                <small><?php echo e(trans('install.first_name_info')); ?></small>
+                <span class="help-block"><?php echo e($errors->first('first_name', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('last_name') ? 'has-error' : ''); ?>">
+            <label for="last_name"><?php echo e(trans('install.last_name')); ?></label>
+            <div class="controls">
+                <?php echo Form::text('last_name', old('last_name'),array('class' => 'form-control')); ?>
+
+                <small><?php echo e(trans('install.last_name_info')); ?></small>
+                <span class="help-block"><?php echo e($errors->first('last_name', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('email') ? 'has-error' : ''); ?>">
+            <label for="email"><?php echo e(trans('install.email')); ?></label>
+            <div class="controls">
+                <?php echo Form::text('email', old('email'),array('class' => 'form-control')); ?>
+
+                <small><?php echo e(trans('install.email_info')); ?></small>
+                <span class="help-block"><?php echo e($errors->first('email', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('password') ? 'has-error' : ''); ?>">
+            <label for="password"><?php echo e(trans('install.password')); ?></label>
+            <div class="controls">
+                <?php echo Form::password('password', array('class' => 'form-control')); ?>
+
+                <small><?php echo e(trans('install.password_info2')); ?></small>
+                <span class="help-block"><?php echo e($errors->first('password', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('password_confirmation') ? 'has-error' : ''); ?>">
+            <label for="password"><?php echo e(trans('install.password_confirmation')); ?></label>
+            <div class="controls">
+                <?php echo Form::password('password_confirmation', array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('password_confirmation', ':message')); ?></span>
+            </div>
+        </div>
+        <button class="btn btn-green pull-right">
+            <?php echo e(trans('install.next')); ?>
+
+            <i class="fa fa-arrow-right"></i>
+        </button>
+        <div class="clearfix"></div>
+    </div>
+    <?php echo Form::close(); ?>
+
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.install', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

@@ -1,0 +1,90 @@
+
+
+<?php /* Web site Title */ ?>
+<?php $__env->startSection('title'); ?>
+    <?php echo e($title); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php /* Content */ ?>
+<?php $__env->startSection('content'); ?>
+    <div class="page-header clearfix">
+    </div>
+    <!-- ./ notifications -->
+    <div class="panel panel-primary">
+    <div class="panel-body">
+            <?php echo Form::open(array('url' => $type.'/store', 'method' => 'post', 'files'=> true)); ?>
+
+       
+        <div class="form-group">
+            <?php echo Form::label('title', trans('Title'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('title', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('title', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <?php echo Form::label('location', trans('Location'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('location', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('location', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <?php echo Form::label('date', trans('date'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('date', null, array('class' => 'form-control date')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('date', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <?php echo Form::label('start_time', trans('Start Time'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('start_time', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('start_time', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <?php echo Form::label('end_time', trans('End Time'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('end_time', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('end_time', ':message')); ?></span>
+            </div>
+        </div>
+    <!-- Form Actions -->
+        <div class="form-group">
+            <div class="controls">
+               
+                <button type="submit" class="btn btn-success"><i class="fa fa-check-square-o"></i> <?php echo e(trans('table.ok')); ?>
+
+                </button>
+            </div>
+        </div>
+        <!-- ./ form actions -->
+
+        <?php echo Form::close(); ?>
+
+    </div>
+</div>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('scripts'); ?>
+    <link href="/files/public/timepicker/timepicki.css" rel="stylesheet">
+    <script type="text/javascript" src="/files/public/timepicker/timepicki.js"></script>
+	<script>
+	$('#start_time').timepicki();
+	$('#end_time').timepicki();
+	</script>	
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.user', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

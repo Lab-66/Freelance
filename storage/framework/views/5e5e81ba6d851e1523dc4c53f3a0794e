@@ -1,0 +1,87 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <div class="form-group">
+            <label class="control-label" for="title"><?php echo e(trans('salesteam.salesteam')); ?></label>
+            <div class="controls">
+                    <?php echo e($salesteam->salesteam); ?>
+
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title"><?php echo e(trans('salesteam.invoice_target')); ?></label>
+            <div class="controls">
+                <?php echo e($salesteam->invoice_target); ?>
+
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title"><?php echo e(trans('salesteam.invoice_forecast')); ?></label>
+            <div class="controls">
+                <?php echo e($salesteam->invoice_forecast); ?>
+
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title"><?php echo e(trans('salesteam.actual_invoice')); ?></label>
+            <div class="controls">
+                <?php echo e($salesteam->actualInvoice->sum('grand_total')); ?>
+
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title"><?php echo e(trans('salesteam.actual_invoices')); ?></label>
+            <div class="controls">
+                <ul>
+                    <?php foreach($salesteam->actualInvoice as $item): ?>
+                        <li><a href="<?php echo e(url('invoice/'.$item->id.'/show')); ?>"><?php echo e($item->invoice_number); ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title"><?php echo e(trans('salesteam.team_leader')); ?></label>
+            <div class="controls">
+                <?php echo e(is_null($salesteam->teamLeader)?"":$salesteam->teamLeader->full_name); ?>
+
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="title"><?php echo e(trans('salesteam.responsibility')); ?></label>
+            <div class="controls">
+                <label>
+                    <input type="checkbox" value="1" name="quotations" class='icheck' disabled
+                           <?php if(isset($salesteam) && $salesteam->quotations==1): ?> checked <?php endif; ?>>
+                    <?php echo e(trans('salesteam.quotations')); ?> </label>
+                <label>
+                    <input type="checkbox" value="1" name="leads" class='icheck' disabled
+                           <?php if(isset($salesteam) && $salesteam->leads==1): ?> checked <?php endif; ?>>
+                    <?php echo e(trans('salesteam.leads')); ?> </label>
+                <label>
+                    <input type="checkbox" value="1" name="opportunities" class='icheck' disabled
+                           <?php if(isset($salesteam) && $salesteam->opportunities==1): ?> checked <?php endif; ?>>
+                    <?php echo e(trans('salesteam.opportunities')); ?> </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="controls">
+                <?php if(@$action == 'show'): ?>
+                    <a href="<?php echo e(url($type)); ?>" class="btn btn-primary"><i class="fa fa-arrow-left"></i> <?php echo e(trans('table.close')); ?></a>
+                <?php else: ?>
+                    <a href="<?php echo e(url($type)); ?>" class="btn btn-primary"><i class="fa fa-arrow-left"></i> <?php echo e(trans('table.back')); ?></a>
+                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> <?php echo e(trans('table.delete')); ?></button>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php $__env->startSection('scripts'); ?>
+    <script>
+        $(document).ready(function () {
+            $('.icheck').iCheck({
+                checkboxClass: 'icheckbox_minimal-blue',
+                radioClass: 'iradio_minimal-blue'
+            });
+        });
+    </script>
+<?php $__env->stopSection(); ?>

@@ -1,0 +1,432 @@
+<div class="nav_profile">
+    <div class="media profile-left">
+        <a class="pull-left profile-thumb" href="#">
+            <?php if($user_data->user_avatar): ?>
+                <img src="<?php echo url('/').'/uploads/avatar/'.$user_data->user_avatar; ?>" alt="img"
+                     class="img-rounded"/>
+            <?php else: ?>
+                <img src="<?php echo e(url('uploads/avatar/user.png')); ?>" alt="img" class="img-rounded"/>
+            <?php endif; ?>
+        </a>
+        <div class="content-profile">
+            <h4 class="media-heading"><?php echo e($user_data->full_name); ?></h4>
+            <ul class="icon-list">
+                <li>
+                    <a href="<?php echo e(url('mailbox')); ?>#/m/inbox" title="Email">
+                        <i class="fa fa-fw fa-envelope"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo e(url('sales_order')); ?>" title="Sales Order">
+                        <i class="fa fa-fw fa-usd"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo e(url('invoice')); ?>" title="Invoices">
+                        <i class="fa fa-fw fa-file-text"></i>
+                    </a>
+                </li>
+                <?php if(Sentinel::inRole('admin')): ?>
+                    <li>
+                        <a href="<?php echo e(url('setting')); ?>" title="Settings">
+                            <i class="fa fa-fw fa-cog"></i>
+                        </a>
+                    </li>
+                <?php endif; ?>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<ul class="navigation">
+
+    <li class="header">Main Navigation</li>
+
+    <li <?php echo (Request::is('/') ? 'class=""' : ''); ?>>
+        <a href="<?php echo e(url('/')); ?>">
+        <span class="nav-icon">
+            <i class="fa fa-dashboard"></i>
+        </span>
+            <span class="nav-text"> <?php echo e(trans('left_menu.dashboard')); ?></span>
+        </a>
+    </li>
+
+
+    <?php if(isset($user_data) && ($user_data->hasAccess(['contacts.read']) || $user_data->inRole('admin'))): ?>
+        <li <?php echo (Request::is('customer/*') || Request::is('customer') || Request::is('company/*') || Request::is('company') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('company')); ?>" onclick="window.location.href='<?php echo e(url('company')); ?>'">
+            <span class="nav-caret pull-right">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+            <span class="nav-icon">
+               <i class="fa fa-user-plus"></i>
+            </span>
+                <span class="nav-text"><?php /* <?php echo e(trans('left_menu.customers')); ?> */ ?>CRM</span>
+            </a>
+            <ul class="nav-sub">
+                <li <?php echo (Request::is('company/*') || Request::is('company') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('company')); ?>">
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"><?php echo e(trans('left_menu.company')); ?></span></a>
+                </li>
+                <li <?php echo (Request::is('customer/*') || Request::is('customer') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('customer')); ?>">
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"><?php echo e(trans('left_menu.contact_person')); ?></span></a>
+                </li>
+                <li <?php echo (Request::is('customer/*') || Request::is('customer') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('running_projects')); ?>">
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"><?php echo e('Running Projects'); ?></span></a>
+                </li>
+                <li <?php echo (Request::is('customer/*') || Request::is('customer') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('notes')); ?>">
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"><?php echo e('Note'); ?></span></a>
+                </li>
+                <li <?php echo (Request::is('customer/*') || Request::is('customer') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('background_information')); ?>">
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"><?php echo e('Background Information'); ?></span></a>
+                </li>
+            </ul>
+        </li>
+    <?php endif; ?>
+
+
+    <?php if(isset($user_data) && ($user_data->hasAccess(['opportunities.read']) || $user_data->inRole('admin'))): ?>
+        <li <?php echo (Request::is('opportunity*') || Request::is('opportunity') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('opportunity')); ?>">
+        <span class="nav-icon">
+            <i class="fa fa-suitcase"></i>
+        </span>
+                <span class="nav-text"><?php echo e(trans('left_menu.opportunities')); ?></span>
+            </a>
+        </li>
+    <?php endif; ?>
+
+
+
+    <?php if(isset($user_data) && ($user_data->hasAccess(['leads.read']) || $user_data->inRole('admin'))): ?>
+       <li <?php echo (Request::is('lead*') || Request::is('lead') ? 'class="active"' : ''); ?> >
+                    <a href="<?php echo e(url('lead')); ?>">
+                        <i class="fa fa-thumbs-up"></i>
+                        <span class="nav-text"><?php echo e(trans('left_menu.leads')); ?></span></a>
+        </li>
+
+    <?php endif; ?>
+
+
+
+    <li>
+
+        <a href="#">
+            <span class="nav-caret pull-right">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+
+            <span class="nav-icon">
+               <i class="fa fa-list-alt"></i>
+            </span>
+
+            <span class="nav-text"><?php /* <?php echo e(trans('left_menu.customers')); ?> */ ?>Planning</span>
+
+        </a>
+
+
+        <ul class="nav-sub">
+
+            <li <?php echo (Request::is('/task') ? 'class="active"' : ''); ?>>
+                <a href="<?php echo e(url('/task')); ?>">
+                <span class="nav-icon">
+                    <i class="fa fa-circle-o"></i>
+                </span>
+                    <span class="nav-text"> <?php echo e(trans('left_menu.tasks')); ?></span>
+                </a>
+            </li>
+
+            <?php if(isset($user_data) && ($user_data->hasAccess(['meetings.read']) || $user_data->inRole('admin'))): ?>
+                <li <?php echo (Request::is('meeting/*') || Request::is('meeting') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('meeting')); ?>">
+                <span class="nav-icon">
+                    <i class="fa fa-circle-o"></i>
+                </span>
+                        <span class="nav-text"><?php echo e(trans('left_menu.meetings')); ?></span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php if(isset($user_data) && ($user_data->hasAccess(['logged_calls.read']) || $user_data->inRole('admin'))): ?>
+                <li <?php echo (Request::is('call/*') || Request::is('call') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('call')); ?>">
+                <span class="nav-icon">
+                    <i class="fa fa-circle-o"></i>
+                </span>
+                        <span class="nav-text"><?php echo e(trans('left_menu.calls')); ?></span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+
+
+        </ul>
+
+    </li>
+
+
+    <li <?php echo (Request::is('calendar/*') || Request::is('calendar') ? 'class="active"' : ''); ?>>
+        <a href="<?php echo e(url('calendar')); ?>">
+        <span class="nav-icon">
+            <i class="fa fa-calendar"></i>
+        </span>
+            <span class="nav-text"><?php echo e(trans('left_menu.calendar')); ?></span>
+        </a>
+    </li>
+     <li <?php echo (Request::is('agenda/') || Request::is('calendar') ? 'class="active"' : ''); ?>>
+        <a href="<?php echo e(url('agenda')); ?>">
+        <span class="nav-icon">
+            <i class="fa fa-calendar"></i>
+        </span>
+            <span class="nav-text"><?php echo e(trans('Agenda')); ?></span>
+        </a>
+    </li>
+    
+
+
+    <?php if(isset($user_data) && ($user_data->hasAccess(['invoices.read']) || $user_data->inRole('admin'))): ?>
+        <li <?php echo (Request::is('invoice/*') || Request::is('invoice')  ||
+            Request::is('invoices_payment_log/*') || Request::is('invoices_payment_log') ? 'class="active"' : ''); ?>>
+            <a>
+        <span class="nav-caret pull-right">
+          <i class="fa fa-angle-left pull-right"></i>
+        </span>
+        <span class="nav-icon">
+           <i class="fa fa-book"></i>
+        </span>
+                <span class="nav-text"><?php echo e(trans('left_menu.invoices')); ?></span>
+            </a>
+            <ul class="nav-sub">
+                <li <?php echo (Request::is('invoice/*') || Request::is('invoice') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('invoice')); ?>">
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"><?php echo e(trans('left_menu.invoices')); ?></span></a>
+                </li>
+                <li <?php echo (Request::is('invoices_payment_log/*') || Request::is('invoices_payment_log') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('invoices_payment_log')); ?>">
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"><?php echo e(trans('left_menu.payment_log')); ?></span></a>
+                </li>
+            </ul>
+        </li>
+    <?php endif; ?>
+
+
+    <li>
+
+        <a href="#">
+            <span class="nav-caret pull-right">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+
+            <span class="nav-icon">
+               <i class="fa fa-file-text"></i>
+            </span>
+
+            <span class="nav-text">Sales</span>
+
+        </a>
+
+        <ul class="nav-sub">
+
+            <?php if(isset($user_data) && ($user_data->hasAccess(['sales_team.read']) || $user_data->inRole('admin'))): ?>
+                <li <?php echo (Request::is('salesteam/*') || Request::is('salesteam') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('salesteam')); ?>">
+
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"> <?php echo e(trans('left_menu.salesteam')); ?></span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php if(isset($user_data) && ($user_data->hasAccess(['sales_orders.read']) || $user_data->inRole('admin'))): ?>
+                <li <?php echo (Request::is('sales_order/*') || Request::is('sales_order') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('sales_order')); ?>">
+     
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"><?php echo e(trans('left_menu.sales_order')); ?></span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+        </ul>
+
+    </li>
+
+
+
+    <?php if(isset($user_data) && ($user_data->hasAccess(['products.read']) || $user_data->inRole('admin'))): ?>
+        <li <?php echo (Request::is('product/*') || Request::is('product')  || Request::is('category/*') || Request::is('category') ? 'class="active"' : ''); ?>>
+            <a>
+        <span class="nav-caret pull-right">
+          <i class="fa fa-angle-left pull-right"></i>
+        </span>
+        <span class="nav-icon">
+           <i class="fa fa-calendar-o"></i>
+        </span>
+                <span class="nav-text"><?php echo e(trans('left_menu.products')); ?></span>
+            </a>
+            <ul class="nav-sub">
+                <li <?php echo (Request::is('product/*') || Request::is('product') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('product')); ?>">
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"><?php echo e(trans('left_menu.products')); ?></span></a>
+                </li>
+                <li <?php echo (Request::is('category/*') || Request::is('category') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('category')); ?>">
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text"><?php echo e(trans('left_menu.category')); ?></span></a>
+                </li>
+            </ul>
+        </li>
+    <?php endif; ?>
+
+
+    <li <?php echo (Request::is('support_ticket/*') || Request::is('support_ticket')  ? 'class="active"' : ''); ?>>
+        <a>
+        <span class="nav-caret pull-right">
+          <i class="fa fa-angle-left pull-right"></i>
+        </span>
+        <span class="nav-icon">
+           <i class="fa fa-calendar-o"></i>
+        </span>
+                <span class="nav-text">Support</span>
+            </a>
+         <ul class="nav-sub">
+                <li <?php echo (Request::is('support_ticket/*') || Request::is('support_ticket') ? 'class="active"' : ''); ?>>
+                    <a href="<?php echo e(url('support_ticket')); ?>">
+                        <i class="fa fa-circle-o"></i>
+                        <span class="nav-text">Tickets</span></a>
+                </li>
+                
+            </ul>
+        
+        
+    </li>
+
+
+   <!-- <li>
+        <a href="#">
+
+            <span class="nav-icon">
+               <i class="fa fa-ticket"></i>
+            </span>
+
+            <span class="nav-text">Tickets</span>
+
+
+        </a>
+    </li>-->
+
+
+    <?php /* Hide Social Sharing
+    <?php if(isset($user_data) && ($user_data->hasAccess(['social.permission']) || $user_data->inRole('admin'))): ?>
+        <li <?php echo (Request::is('social*') || Request::is('social') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('social')); ?>">
+                <span class="nav-icon">
+                 <i class="material-icons text-danger">share</i>
+                </span>
+                <span class="nav-text"><?php echo e(trans('left_menu.social')); ?></span>
+            </a>
+        </li>
+    <?php endif; ?>
+    */ ?>
+
+    <?php if(isset($user_data) && ($user_data->hasAccess(['quotations.read']) || $user_data->inRole('admin'))): ?>
+        <li <?php echo (Request::is('quotation/*') || Request::is('quotation') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('quotation')); ?>">
+                <i class="fa fa-th-list"></i>
+                <span class="nav-text"><?php echo e(trans('left_menu.quotations')); ?></span></a>
+        </li>
+    <?php endif; ?>
+
+    <li class="header">Configuration</li>
+
+    <?php if(isset($user_data) && $user_data->hasAccess(['contracts.read']) || $user_data->inRole('admin')): ?>
+        <?php /*  temporary remove this  && in_array('contracts', Settings::get('modules')) */ ?>
+        <li <?php echo (Request::is('contract/*') || Request::is('contract') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('contract')); ?>">
+            <span class="nav-icon">
+                <i class="fa fa-file-image-o"></i>
+            </span>
+                <span class="nav-text"><?php echo e(trans('left_menu.contracts')); ?></span>
+            </a>
+        </li>
+    <?php endif; ?>
+
+    <?php if(isset($user_data) && $user_data->hasAccess(['staff.read']) || $user_data->inRole('admin')): ?>
+        <li <?php echo (Request::is('staff/*') || Request::is('staff') ? 'class="active"' : ''); ?>>
+        <a href="<?php echo e(url('staff')); ?>">
+            <span class="nav-icon">
+                <i class="fa fa-users"></i>
+            </span>
+            <span class="nav-text"><?php echo e(trans('left_menu.staff')); ?></span>
+        </a>
+        </li>
+    <?php endif; ?>
+
+    <?php if(isset($user_data) && $user_data->inRole('admin')): ?>
+
+        <li <?php echo (Request::is('option/*') || Request::is('option') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('option')); ?>">
+                <span class="nav-icon">
+                    <i class="fa fa-th-large"></i>
+                </span>
+                <span class="nav-text"><?php echo e(trans('left_menu.options')); ?></span>
+            </a>
+        </li>
+
+        <li <?php echo (Request::is('email_template/*') || Request::is('email_template') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('email_template')); ?>">
+                <span class="nav-icon">
+                    <i class="fa fa-envelope"></i>
+                </span>
+
+                <span class="nav-text"><?php echo e(trans('left_menu.email_template')); ?></span>
+            </a>
+        </li>
+
+        <li <?php echo (Request::is('qtemplate/*') || Request::is('qtemplate') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('qtemplate')); ?>">
+                <i class="fa fa-th-list"></i>
+                <span class="nav-text"><?php echo e(trans('left_menu.quotation_template')); ?></span></a>
+        </li>
+
+        <li <?php echo (Request::is('setting/*') || Request::is('setting') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('setting')); ?>">
+                <span class="nav-icon">
+                    <i class="fa fa-cog"></i>
+                </span>
+                <span class="nav-text"><?php echo e(trans('left_menu.settings')); ?></span>
+            </a>
+        </li>
+        
+        <li <?php echo (Request::is('soap/*') || Request::is('soap') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('soap')); ?>">
+                <span class="nav-icon">
+                    <i class="fa fa-cogs"></i>
+                </span>
+                <span class="nav-text"><?php echo e(trans('Soapkoppeling')); ?></span>
+            </a>
+        </li>
+		<!--<li <?php echo (Request::is('support/*') || Request::is('support') ? 'class="active"' : ''); ?>>
+            <a href="<?php echo e(url('support_ticket')); ?>">
+                <span class="nav-icon">
+                    <i class="fa  fa-ticket"></i>
+                </span>
+                <span class="nav-text"><?php echo e(trans('Support Ticket')); ?></span>
+            </a>
+        </li>-->
+
+    <?php endif; ?>
+
+</ul>

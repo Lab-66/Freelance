@@ -1,0 +1,58 @@
+<li class="dropdown messages-menu">
+    <mail-notifications url="<?php echo e(url('/')); ?>"></mail-notifications>
+</li>
+
+<li class="dropdown notifications-menu">
+    <notifications url="<?php echo e(url('/')); ?>"></notifications>
+</li>
+<li class="dropdown user user-menu">
+    <a href="#" class="dropdown-toggle padding-user" data-toggle="dropdown">
+        <?php if($user_data->user_avatar): ?>
+            <img src="<?php echo url('/').'/uploads/avatar/'.$user_data->user_avatar; ?>" alt="img"
+                 class="img-circle img-responsive pull-left" height="35" width="35"/>
+        <?php else: ?>
+            <img src="<?php echo e(url('uploads/avatar/user.png')); ?>" alt="img"
+                 class="img-circle img-responsive pull-left" height="35" width="35"/>
+        <?php endif; ?>
+        <div class="riot">
+            <div>
+                <?php echo e($user_data->full_name); ?>
+
+                <span>
+                                        <i class="caret"></i>
+                                    </span>
+            </div>
+        </div>
+    </a>
+    <ul class="dropdown-menu">
+        <!-- User image -->
+        <li class="user-header">
+            <?php if($user_data->user_avatar): ?>
+                <img src="<?php echo url('/').'/uploads/avatar/'.$user_data->user_avatar; ?>" alt="img"
+                     class="img-circle img-bor"/>
+            <?php else: ?>
+                <img src="<?php echo e(url('uploads/avatar/user.png')); ?>"
+                     alt="img" class="img-circle img-bor"/>
+            <?php endif; ?>
+            <p><?php echo e($user_data->full_name); ?></p>
+        </li>
+        <!-- Menu Body -->
+        <li class="pad-3">
+            <a href="<?php echo e(url('profile')); ?>">
+                <i class="fa fa-fw fa-user"></i>
+                My Profile
+            </a>
+        </li>
+        <li role="presentation"></li>
+        <li role="presentation" class="divider"></li>
+        <!-- Menu Footer-->
+        <li class="user-footer">
+            <div class="pull-right">
+                <a href="<?php echo e(url('logout')); ?>" class="text-danger">
+                    <i class="fa fa-fw fa-sign-out"></i>
+                    Logout
+                </a>
+            </div>
+        </li>
+    </ul>
+</li>

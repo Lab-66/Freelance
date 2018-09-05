@@ -1,0 +1,52 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <?php if(isset($option)): ?>
+            <?php echo Form::model($option, array('url' => $type . '/' . $option->id, 'method' => 'put', 'files'=> true)); ?>
+
+        <?php else: ?>
+            <?php echo Form::open(array('url' => $type, 'method' => 'post', 'files'=> true)); ?>
+
+        <?php endif; ?>
+            <div class="form-group required <?php echo e($errors->has('category') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('type', trans('option.category'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('category', $categories, null, array('id'=>'category', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('category', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('title') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('title', trans('option.title'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('title', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('title', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('value') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('value', trans('option.value'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('value', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('value', ':message')); ?></span>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-group">
+            <div class="controls">
+                <a href="<?php echo e(url($type)); ?>" class="btn btn-primary"><i
+                            class="fa fa-arrow-left"></i> <?php echo e(trans('table.back')); ?></a>
+                <button type="submit" class="btn btn-success"><i
+                            class="fa fa-check-square-o"></i> <?php echo e(trans('table.ok')); ?></button>
+            </div>
+        </div>
+        <!-- ./ form actions -->
+
+        <?php echo Form::close(); ?>
+
+    </div>
+</div>

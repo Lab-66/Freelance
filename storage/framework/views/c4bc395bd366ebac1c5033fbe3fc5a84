@@ -1,0 +1,24 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <div class="form-group">
+            <label class="control-label" for="title"><?php echo e(trans('category.name')); ?></label>
+
+            <div class="controls">
+                <?php if(isset($category)): ?>
+                    <?php echo e($category->name); ?>
+
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="controls">
+                <?php if(@$action == 'show'): ?>
+                    <a href="<?php echo e(url($type)); ?>" class="btn btn-primary"><i class="fa fa-arrow-left"></i> <?php echo e(trans('table.close')); ?></a>
+                <?php else: ?>
+                    <a href="<?php echo e(url($type)); ?>" class="btn btn-primary"><i class="fa fa-arrow-left"></i> <?php echo e(trans('table.back')); ?></a>
+                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> <?php echo e(trans('table.delete')); ?></button>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>

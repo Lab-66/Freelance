@@ -1,0 +1,46 @@
+
+<?php $__env->startSection('content'); ?>
+    <?php echo $__env->make('install.steps', ['steps' => ['welcome' => 'selected done', 'requirements' => 'selected']], array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+    <?php if(! $allLoaded): ?>
+        <div class="alert alert-danger">
+            <?php echo trans('install.system_not_meet_requirements'); ?>
+
+        </div>
+    <?php endif; ?>
+    <div class="step-content">
+        <h3 style="padding-left: 15px; padding-top: 15px"><?php echo e(trans('install.system_requirements')); ?></h3>
+        <hr>
+        <ul class="list-group" style="border-left: 1px solid #a4a4a4; border-right: 1px solid #a4a4a4">
+            <?php foreach($requirements as $extension => $loaded): ?>
+                <li class="list-group-item <?php echo e(! $loaded ? 'list-group-item-danger' : ''); ?>">
+                    <?php echo e($extension); ?>
+
+                    <?php if($loaded): ?>
+                        <span class="badge badge-success"><i class="fa fa-check"></i></span>
+                    <?php else: ?>
+                        <span class="badge badge-danger"><i class="fa fa-times"></i></span>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+        <?php if($allLoaded): ?>
+            <a class="btn btn-green pull-right" href="<?php echo e(url('install/permissions')); ?>">
+                <?php echo e(trans('install.next')); ?>
+
+                <i class="fa fa-arrow-right"></i>
+            </a>
+        <?php else: ?>
+            <a class="btn btn-info pull-right" href="<?php echo e(url('install/permissions')); ?>">
+                <?php echo e(trans('install.refresh')); ?>
+
+                <i class="fa fa-refresh"></i></a>
+            <button class="btn btn-green pull-right" disabled>
+                <?php echo e(trans('install.next')); ?>
+
+                <i class="fa fa-arrow-right"></i>
+            </button>
+        <?php endif; ?>
+        <div class="clearfix"></div>
+    </div>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.install', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

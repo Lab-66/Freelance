@@ -1,0 +1,195 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <?php if(isset($opportunity)): ?>
+            <?php echo Form::model($opportunity, array('url' => $type . '/' . $opportunity->id, 'method' => 'put', 'files'=> true)); ?>
+
+        <?php else: ?>
+            <?php echo Form::open(array('url' => $type, 'method' => 'post', 'files'=> true)); ?>
+
+        <?php endif; ?>
+        <div class="form-group required <?php echo e($errors->has('opportunity') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('opportunity', trans('opportunity.opportunity'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('opportunity', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('opportunity', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('stages') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('stages', trans('opportunity.stages'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('stages', $stages, null, array('id'=>'stages', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('stages', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('expected_revenue') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('expected_revenue', trans('opportunity.expected_revenue'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('expected_revenue', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('expected_revenue', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('probability') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('probability', trans('opportunity.probability'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('probability', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('probability', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('customer_id') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('customer_id', trans('opportunity.customer'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('customer_id', $companies, null, array('id'=>'customer_id', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('customer_id', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('email') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('email', trans('opportunity.email'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::email('email', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('email', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('phone') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('phone', trans('opportunity.phone'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('phone', null, array('class' => 'form-control','data-fv-integer' => "true")); ?>
+
+                <span class="help-block"><?php echo e($errors->first('phone', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('sales_person_id') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('sales_person_id', trans('opportunity.salesperson'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('sales_person_id', $staffs, null, array('id'=>'sales_person_id', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('sales_person_id', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('sales_team_id') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('sales_team_id', trans('opportunity.salesteam'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('sales_team_id', $salesteams, null, array('id'=>'sales_team_id', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('sales_team_id', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('next_action') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('next_action', trans('opportunity.next_action'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('next_action', null, array('class' => 'form-control date')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('next_action', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('next_action_title') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('next_action_title', trans('opportunity.next_action_title'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('next_action_title', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('next_action_title', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('expected_closing') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('expected_closing', trans('opportunity.expected_closing'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('expected_closing', null, array('class' => 'form-control date')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('expected_closing', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('priority') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('priority', trans('opportunity.priority'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('priority', $priority, null, array('id'=>'priority','class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('priority', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('tags') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('tags', trans('opportunity.tags'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('tags[]', $tags, (isset($opportunity)?explode(',',$opportunity->tags):null), array('id'=>'tags','multiple'=>true, 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('tags', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('assigned_partner_id') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('assigned_partner_id', trans('opportunity.assigned_partner_id'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('assigned_partner_id', $companies, null, array('id'=>'assigned_partner_id', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('assigned_partner_id', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('internal_notes') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('internal_notes', trans('opportunity.internal_notes'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::textarea('internal_notes', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('internal_notes', ':message')); ?></span>
+            </div>
+        </div>
+        <!-- Form Actions -->
+        <div class="form-group">
+            <div class="controls">
+                <a href="<?php echo e(route($type.'.index')); ?>" class="btn btn-primary"><i
+                            class="fa fa-arrow-left"></i> <?php echo e(trans('table.back')); ?></a>
+                <button type="submit" class="btn btn-success"><i class="fa fa-check-square-o"></i> <?php echo e(trans('table.ok')); ?>
+
+                </button>
+            </div>
+        </div>
+        <!-- ./ form actions -->
+
+        <?php echo Form::close(); ?>
+
+    </div>
+</div>
+
+<?php $__env->startSection('scripts'); ?>
+    <script>
+        //Stages Select
+        $(function () {
+            $('#stages').change(function () {
+                var stage = $(this).val();
+                if (stage == 'New' || stage == 'Lost' || stage == 'Dead') {
+                    $('#probability').val(0);
+                }
+                if (stage == 'Qualification') {
+                    $('#probability').val(20);
+                }
+                if (stage == 'Proposition') {
+                    $('#probability').val(40);
+                }
+                if (stage == 'Negotiation') {
+                    $('#probability').val(60);
+                }
+                if (stage == 'Won') {
+                    $('#probability').val(100);
+                }
+            }).change();
+        });
+    </script>
+<?php $__env->stopSection(); ?>

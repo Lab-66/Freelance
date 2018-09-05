@@ -1,0 +1,121 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <?php if(isset($meeting)): ?>
+            <?php echo Form::model($meeting, array('url' => $type . '/' . $meeting->id, 'method' => 'put', 'files'=> true)); ?>
+
+        <?php else: ?>
+            <?php echo Form::open(array('url' => $type, 'method' => 'post', 'files'=> true)); ?>
+
+        <?php endif; ?>
+        <div class="form-group required <?php echo e($errors->has('meeting_subject') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('meeting_subject', trans('meeting.meeting_subject'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('meeting_subject', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('meeting_subject', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('responsible_id') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('responsible_id', trans('meeting.responsible'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('responsible_id', $staffs, null, array('id'=>'responsible_id', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('responsible_id', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('attendees') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('attendees', trans('meeting.attendees'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('attendees[]', $companies, (isset($meeting)?explode(',',$meeting->attendees):null), array('id'=>'attendees','multiple'=>true, 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('attendees', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('starting_date') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('starting_date', trans('meeting.starting_date'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('starting_date', null, array('class' => 'form-control datetime')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('starting_date', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('ending_date') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('ending_date', trans('meeting.ending_date'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('ending_date', null, array('class' => 'form-control datetime')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('ending_date', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('location') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('location', trans('meeting.location'), array('class' => 'control-label required')); ?>
+
+            <div class="controls">
+                <?php echo Form::text('location', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('location', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('meeting_description') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('meeting_description', trans('meeting.meeting_description'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::textarea('meeting_description', null, array('class' => 'form-control')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('meeting_description', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" value="1" name="all_day" class='icheck'
+                       <?php if(isset($meeting) && $meeting->all_day==1): ?>checked <?php endif; ?>>
+                <?php echo e(trans('meeting.all_day')); ?> </label>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('privacy') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('privacy', trans('meeting.privacy'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('privacy', $privacy, null, array('id'=>'privacy', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('privacy', ':message')); ?></span>
+            </div>
+        </div>
+        <div class="form-group required <?php echo e($errors->has('show_time_as') ? 'has-error' : ''); ?>">
+            <?php echo Form::label('show_time_as', trans('meeting.show_time_as'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+                <?php echo Form::select('show_time_as', $show_times, null, array('id'=>'show_time_as', 'class' => 'form-control select2')); ?>
+
+                <span class="help-block"><?php echo e($errors->first('show_time_as', ':message')); ?></span>
+            </div>
+        </div>
+        <!-- Form Actions -->
+        <div class="form-group">
+            <div class="controls">
+                <a href="<?php echo e(route($type.'.index')); ?>" class="btn btn-primary"><i class="fa fa-arrow-left"></i> <?php echo e(trans('table.back')); ?></a>
+                <button type="submit" class="btn btn-success"><i class="fa fa-check-square-o"></i> <?php echo e(trans('table.ok')); ?></button>
+            </div>
+        </div>
+        <!-- ./ form actions -->
+
+        <?php echo Form::close(); ?>
+
+    </div>
+</div>
+
+
+<?php $__env->startSection('scripts'); ?>
+    <script>
+        $(document).ready(function () {
+            $('.icheck').iCheck({
+                checkboxClass: 'icheckbox_minimal-blue',
+                radioClass: 'iradio_minimal-blue'
+            });
+        });
+    </script>
+<?php $__env->stopSection(); ?>

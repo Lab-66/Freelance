@@ -1,0 +1,46 @@
+
+
+<?php /* Web site Title */ ?>
+<?php $__env->startSection('title'); ?>
+    <?php echo e($title); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php /* Content */ ?>
+<?php $__env->startSection('content'); ?>
+    
+<?php echo Form::open(array('url' => 'sales_orders/filtersales' , 'method' => 'post')); ?>
+
+ 
+	<div class="panel-body">
+    	<div class="form-group">
+            <?php echo Form::label('pyear', trans('Which year are you want to check?'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+           		<?php echo Form::select('pyear', $years); ?>
+
+            </div>
+        </div>
+        <div class="form-group">
+            <?php echo Form::label('pmonth', trans('Which month are your want to check?'), array('class' => 'control-label')); ?>
+
+            <div class="controls">
+               <?php echo Form::select('pmonth', $months); ?>
+
+            </div>
+        </div>
+         <div class="form-group">
+            <div class="controls">
+            
+                <button type="submit" class="btn btn-success"><i class="fa fa-filter"></i> <?php echo e(trans('Filter')); ?></button>
+            </div>
+        </div>
+	</div>
+<?php echo Form::close(); ?>
+
+
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
+    
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.user', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

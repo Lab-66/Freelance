@@ -1,0 +1,356 @@
+<?php $__env->startSection('styles'); ?>
+    <link rel="stylesheet" href="<?php echo e(asset('css/icheck.css')); ?>" type="text/css">
+<?php $__env->stopSection(); ?>
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <div class="nav-tabs-custom" id="user_tabs">
+            <ul class="nav nav-tabs" style="display:list-item;">
+                <li class="active">
+                    <a href="#general"
+                       data-toggle="tab" title="<?php echo e(trans('staff.info')); ?>"><i
+                                class="material-icons md-24">info</i></a>
+                </li>
+                <li>
+                    <a href="#logins"
+                       data-toggle="tab" title="<?php echo e(trans('staff.login')); ?>"><i
+                                class="material-icons md-24">lock</i></a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="general">
+                    <div class="form-group">
+                        <label class="control-label" for="title"><?php echo e(trans('staff.full_name')); ?></label>
+                        <div class="controls">
+                            <?php echo e($staff->full_name); ?>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="title"><?php echo e(trans('staff.email')); ?></label>
+                        <div class="controls">
+                            <?php echo e($staff->email); ?>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="title"><?php echo e(trans('staff.phone_number')); ?></label>
+                        <div class="controls">
+                            <?php echo e($staff->phone_number); ?>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <?php if(isset($staff->user_avatar)): ?>
+                            <img src="<?php echo e(url('uploads/avatar/thumb_'.$staff->user_avatar)); ?>" alt="User Image">
+                        <?php endif; ?>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel-content">
+                                <h5><?php echo e(trans('staff.permissions')); ?></h5>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.sales_teams')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="sales_team.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['sales_team.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="sales_team.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['sales_team.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="sales_team.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['sales_team.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.leads')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="leads.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['leads.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="leads.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['leads.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="leads.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['leads.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.opportunities')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="opportunities.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['opportunities.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="opportunities.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['opportunities.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="opportunities.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['opportunities.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.logged_calls')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="logged_calls.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['logged_calls.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="logged_calls.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['logged_calls.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="logged_calls.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['logged_calls.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.meetings')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="meetings.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['meetings.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="meetings.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['meetings.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="meetings.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['meetings.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.products')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="products.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['products.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="products.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['products.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="products.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['products.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">&nbsp;</div>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.quotations')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="quotations.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['quotations.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="quotations.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['quotations.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="quotations.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['quotations.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.sales_orders')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="sales_orders.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['sales_orders.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="sales_orders.write"
+                                                       disabled
+                                                       class='icheck'
+                                                       <?php if(isset($staff) && $staff->hasAccess(['sales_orders.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="sales_orders.delete"
+                                                       disabled
+                                                       class='icheck'
+                                                       <?php if(isset($staff) && $staff->hasAccess(['sales_orders.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.invoices')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="invoices.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['invoices.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="invoices.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['invoices.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="invoices.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['invoices.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.contracts')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="contracts.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['contracts.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="contracts.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['contracts.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="contracts.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['contracts.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.staff')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="staff.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['staff.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="staff.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['staff.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="staff.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['staff.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.contacts')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="contacts.read"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['contacts.read'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.read')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="contacts.write"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['contacts.write'])): ?> checked <?php endif; ?>>
+                                                <i class="warning"></i> <?php echo e(trans('staff.write')); ?> </label>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="contacts.delete"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['contacts.delete'])): ?> checked <?php endif; ?>>
+                                                <i class="danger"></i> <?php echo e(trans('staff.delete')); ?> </label>
+                                        </div>
+                                    </div><div class="col-md-2">
+                                        <p><strong><?php echo e(trans('staff.social')); ?></strong></p>
+                                        <div class="input-group">
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="social.permission"
+                                                       class='icheck' disabled
+                                                       <?php if(isset($staff) && $staff->hasAccess(['social.permission'])): ?> checked <?php endif; ?>>
+                                                <i class="success"></i> <?php echo e(trans('staff.permission')); ?></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">&nbsp;</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="logins">
+                    <table class="table table-striped table-bordered dataTable no-footer">
+                        <thead>
+                        <td><?php echo e(trans('staff.date_time')); ?></td>
+                        <td><?php echo e(trans('staff.ip_address')); ?></td>
+                        </thead>
+                        <tbody>
+                        <?php foreach($staff->logins as $login ): ?>
+                            <tr>
+                                <td><?php echo e($login->created_at->format(Settings::get('date_format').' '. Settings::get('time_format'))); ?></td>
+                                <td><?php echo e($login->ip_address); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="controls">
+                <?php if(@$action == 'show'): ?>
+                    <a href="<?php echo e(url($type)); ?>" class="btn btn-primary"><i
+                                class="fa fa-arrow-left"></i> <?php echo e(trans('table.close')); ?></a>
+                <?php else: ?>
+                    <a href="<?php echo e(url($type)); ?>" class="btn btn-primary"><i
+                                class="fa fa-arrow-left"></i> <?php echo e(trans('table.back')); ?></a>
+                    <button type="submit" class="btn btn-danger"><i
+                                class="fa fa-trash"></i> <?php echo e(trans('table.delete')); ?></button>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php $__env->startSection('scripts'); ?>
+    <script type="text/javascript" src="<?php echo e(asset('js/icheck.min.js')); ?>"></script>
+    <script>
+        $(document).ready(function () {
+            $('.icheck').iCheck({
+                checkboxClass: 'icheckbox_minimal-blue',
+                radioClass: 'iradio_minimal-blue'
+            });
+        });
+    </script>
+<?php $__env->stopSection(); ?>

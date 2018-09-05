@@ -1,0 +1,54 @@
+
+
+<?php /* Web site Title */ ?>
+<?php $__env->startSection('title'); ?>
+    <?php echo e($title); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php /* Content */ ?>
+<?php $__env->startSection('content'); ?>
+<div class="page-header clearfix">
+<a href="http://93.158.221.197/files/public/sales_orders/prev_month" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back</a>
+</div>
+<div class="panel panel-default">
+<div class="panel-body">
+            <table id="filter" class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th><?php echo e(trans('sales_order.sale_number')); ?></th>
+                    <th><?php echo e(trans('sales_order.date')); ?></th>
+                    <th class="sorting"><?php echo e(trans('sales_order.customer')); ?></th>
+                    <th><?php echo e(trans('sales_order.total')); ?></th>
+                    <th><?php echo e(trans('sales_order.status')); ?></th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                	<?php foreach($FilterSales as $each): ?>
+                    <tr>
+                    	<td><?php echo e($each->sale_number); ?></td>
+                        <td><?php echo e($each->date); ?></td>
+                        <td><?php echo e($each->first_name.' '.$each->last_name); ?></td>
+                        <td><?php echo e($each->total); ?></td>
+                        <td><?php echo e($each->status); ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                
+                </tbody>
+            </table>
+        </div>
+        </div>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
+<script type="text/javascript" src="http://93.158.221.197/files/public/js/jquery.tablesorter.js"></script> 
+  <script type="application/javascript">  
+    $(document).ready(function() 
+    { 
+        $("#filter").tablesorter( {sortList: [[2,1]]} ); 
+    } 
+); 
+</script>
+    
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.user', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

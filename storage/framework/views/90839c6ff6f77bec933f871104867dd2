@@ -1,0 +1,148 @@
+
+
+<?php /* Web site Title */ ?>
+<?php $__env->startSection('title'); ?>
+    <?php echo e($title); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('styles'); ?>
+    <link rel="stylesheet" href="<?php echo e(asset('css/icheck.css')); ?>" type="text/css">
+<?php $__env->stopSection(); ?>
+<?php /* Content */ ?>
+<?php $__env->startSection('content'); ?>
+    <?php echo $__env->make('vendor.flash.message', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+    <div class="panel panel-primary" xmlns:v-bind="http://symfony.com/schema/routing">
+        <div class="panel-body">
+            <span class="pull-right">
+                <a href="#" class="text-muted">
+                    <i class="fa fa-gear"></i>
+                </a>
+            </span>
+            <?php echo Form::open(array('url' => '/setting', 'method' => 'post', 'files'=> true, 'id' => 'setting_submit')); ?>
+
+
+            <div class="nav-tabs-custom" id="setting_tabs">
+                <ul class="nav nav-tabs" style="display:list-item;">
+                    <li class="active">
+                        <a href="#factuur_configuration"
+                           data-toggle="tab" title="<?php echo e(trans('Factuur Settings')); ?>">Factuur</a>
+                    </li>
+                    <li>
+                        <a href="#relatie_configuration"
+                           data-toggle="tab" title="<?php echo e(trans('Relatie Settings')); ?>">Relatie</a>
+                    </li>
+                    <li>
+                        <a href="#grootboekrekening_configuration"
+                           data-toggle="tab" title="<?php echo e(trans('Grootboekrekening Settings')); ?>">Grootboekrekening</a>
+                    </li>
+                    <li>
+                        <a href="#mutaties_configuration"
+                           data-toggle="tab" title="<?php echo e(trans('Mutaties Settings')); ?>">Mutaties</a>
+                    </li>
+                    
+                </ul>
+               
+            </div>
+            <!-- Form Actions -->
+            <div class="tab-content">
+				<div class="tab-pane active" id="factuur_configuration">
+                	<iframe src="http://93.158.221.197/files/public/soap/factuur" width="100%" border="0" height="900" style="border:none;"></iframe>
+				</div>
+                <div class="tab-pane" id="relatie_configuration">
+                	<iframe src="http://93.158.221.197/files/public/soap/relatie" width="100%" border="0" height="900" style="border:none;"></iframe>
+				</div>
+                <div class="tab-pane" id="grootboekrekening_configuration">
+                	<i>Coming Soon...</i>
+				</div>
+                <div class="tab-pane" id="mutaties_configuration">
+                	<i>Coming Soon...</i>
+				</div>
+            </div>
+            
+            <!-- ./ form actions -->
+
+            <?php echo Form::close(); ?>
+
+        </div>
+    </div>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('scripts'); ?>
+
+<script> 
+    $(document).on("click", "#upload", function() {
+  var file_data = $("#avatar").prop("files")[0]; // Getting the properties of file from file field
+  var form_data = new FormData(); // Creating object of FormData class
+  form_data.append("file", file_data) // Appending parameter named file with properties of file_field to form_data
+  form_data.append("user_id", 123) // Adding extra parameters to form_data
+  $.ajax({
+    url: "http://93.158.221.197/files/public/slider_upload", // Upload Script
+    dataType: 'script',
+    cache: false,
+    contentType: false,
+    processData: false,
+    data: form_data, // Setting the data attribute of ajax with file_data
+    type: 'post',
+    success: function(data) {
+        alert('success');
+      // Do something after Ajax completes 
+    }
+  });
+});
+</script>
+    <script type="text/javascript" src="<?php echo e(asset('js/icheck.min.js')); ?>"></script>
+    <script>
+        $(document).ready(function(){
+            $('.icheck').iCheck({
+                checkboxClass: 'icheckbox_minimal-blue',
+                radioClass: 'iradio_minimal-blue'
+            });
+
+            $("input[name='date_format']").on('ifChecked', function () {
+                if ("date_format_custom_radio" != $(this).attr("id"))
+                    $("input[name='date_format_custom']").val($(this).val()).siblings('.example').text($(this).siblings('span').text());
+            });
+            $("input[name='date_format_custom']").focus(function () {
+                $("#date_format_custom_radio").attr("checked", "checked");
+            });
+
+            $("input[name='time_format']").on('ifChecked', function () {
+                if ("time_format_custom_radio" != $(this).attr("id"))
+                    $("input[name='time_format_custom']").val($(this).val()).siblings('.example').text($(this).siblings('span').text());
+            });
+            $("input[name='time_format_custom']").focus(function () {
+                $("#time_format_custom_radio").attr("checked", "checked");
+            });
+            $("input[name='date_format_custom'], input[name='time_format_custom']").on('ifChecked', function () {
+                var format = $(this);
+                format.siblings('img').css('visibility', 'visible');
+                $.post(ajaxurl, {
+                    action: 'date_format_custom' == format.attr('name') ? 'date_format' : 'time_format',
+                    date: format.val()
+                }, function (d) {
+                    format.siblings('img').css('visibility', 'hidden');
+                    format.siblings('.example').text(d);
+                });
+            });
+        });
+        jQuery(document).ready(function($) {
+            $('.smtp').hide();
+            $('.email_driver').change(function () {
+                if($(this).filter(':checked').val()=='smtp')
+                {
+                    $('.smtp').show();
+                }
+                else {
+                    $('.smtp').hide();
+                }
+            });
+            if($(this).filter(':checked').val()=='smtp')
+            {
+                $('.smtp').show();
+            }
+        })
+    </script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.user', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
